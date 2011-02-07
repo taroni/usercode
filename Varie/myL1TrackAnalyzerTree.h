@@ -405,7 +405,7 @@ class myL1TrackAnalyzerTree : public edm::EDAnalyzer
 
 
   typedef  struct BRANCH { 
-    std::vector<int> simTrkQ, L1TrkQ, recoTrkQ, simTrkPdgId;
+    std::vector<int> simTrkQ, L1TrkQ, recoTrkQ, simTrkPdgId, L1TrkQNoMatch;
     std::vector< pair <int, int > >genWQ, genMuQ, genWPdgId, genMuPdgId;
     std::vector<size_t> simTrkSize, L1TrkSize, recoTrkSize;
     std::vector<bool> recoTrkIsMuon, recoTrkIsHiggsMuon;

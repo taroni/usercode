@@ -25,7 +25,7 @@ myL1TrackAnalyzerTree::~myL1TrackAnalyzerTree()
 // ANALYZE
 void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& es)
 {
-  std::vector<int> simTrkQ, L1TrkQ, recoTrkQ, simTrkPdgId;
+  std::vector<int> simTrkQ, L1TrkQ, recoTrkQ, simTrkPdgId, L1TrkQNoMatch;
   std::vector< pair <int, int > > genWQ, genMuQ, genWPdgId, genMuPdgId;
   std::vector<size_t> simTrkSize, L1TrkSize, recoTrkSize;
   std::vector<bool> recoTrkIsMuon, recoTrkIsHiggsMuon;
@@ -108,128 +108,139 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
 
   if (higgs == 0){
     cout << __LINE__ << " No Higgs in the event" <<endl;
-    return;
+//     return;
   }
+  
+  // cout << __LINE__ << endl;
+  
+  if (higgs!=0){
 
-  genHiggsPx.push_back(higgs->px());
-  genHiggsPt.push_back(higgs->pt());
-  genHiggsPy.push_back(higgs->py());
-  genHiggsPz.push_back(higgs->pz());
-  genHiggsEta.push_back(higgs->eta());
-  genHiggsPhi.push_back(higgs->phi());
-  genHiggsVtxX.push_back(higgs->vx());
-  genHiggsVtxY.push_back(higgs->vy());
-  genHiggsVtxZ.push_back(higgs->vz());
-  genHiggsMass.push_back(higgs->mass());
-  genHiggsE.push_back(higgs->energy());
-
-  for (Candidate::const_iterator higgsD=higgs->begin(); higgsD!=higgs->end();++higgsD){
-    if (higgsD->pdgId()==higgs->pdgId() && higgsD->status()==higgs->status()) 
-      cout << __LINE__ << "daughter is the same particle of the mother" << endl;
-    if (higgsD->pdgId()==higgs->pdgId()) continue;
-
-    if (fabs(higgsD->pdgId())!=24) continue;
-    if (w1 == 0){
-      w1 = &* higgsD;
-    } else {
-      if (w2!=0) cout << __LINE__ <<" MORE THAN 2 W IN THE EVENT " << e.id()<< endl;
-      w2 = &*higgsD;
-    }
-  }
-
-  if (w1 == 0 || w2==0) {
-    cout << __LINE__ << " No W in the event " << endl;
-    return ;
-  } 
-  for (Candidate::const_iterator w1D= w1->begin(); w1D!=w1->end(); ++w1D){
-    if (fabs(w1D->pdgId())==24) continue;
-    if (!w1D->daughter(0))continue;
-    if (muW1 == 0 && fabs(w1D->pdgId())==13){
-      for (unsigned int dau = 0; dau < w1D->numberOfDaughters(); dau++){
-	if(w1D->daughter(dau)->pdgId() == w1D->pdgId() &&  w1D->daughter(dau)->status()==1) muW1 = &*(w1D->daughter(dau));
+    genHiggsPx.push_back(higgs->px());
+    genHiggsPt.push_back(higgs->pt());
+    genHiggsPy.push_back(higgs->py());
+    genHiggsPz.push_back(higgs->pz());
+    genHiggsEta.push_back(higgs->eta());
+    genHiggsPhi.push_back(higgs->phi());
+    genHiggsVtxX.push_back(higgs->vx());
+    genHiggsVtxY.push_back(higgs->vy());
+    genHiggsVtxZ.push_back(higgs->vz());
+    genHiggsMass.push_back(higgs->mass());
+    genHiggsE.push_back(higgs->energy());
+    
+    
+    for (Candidate::const_iterator higgsD=higgs->begin(); higgsD!=higgs->end();++higgsD){
+      if (higgsD->pdgId()==higgs->pdgId() && higgsD->status()==higgs->status()) 
+	cout << __LINE__ << "daughter is the same particle of the mother" << endl;
+      if (higgsD->pdgId()==higgs->pdgId()) continue;
+      
+      if (fabs(higgsD->pdgId())!=24) continue;
+      if (w1 == 0){
+	w1 = &* higgsD;
+      } else {
+	if (w2!=0) cout << __LINE__ <<" MORE THAN 2 W IN THE EVENT " << e.id()<< endl;
+	w2 = &*higgsD;
       }
     }
-    if (nuW1 == 0 && fabs(w1D->pdgId())==14){
-      for (unsigned int dau = 0; dau < w1D->numberOfDaughters(); dau++){
-	if(w1D->daughter(dau)->pdgId() == w1D->pdgId() &&  w1D->daughter(dau)->status()==1) nuW1 = &*(w1D->daughter(dau));
-      } 
-    }
-  }
-
-  for (Candidate::const_iterator w2D= w2->begin(); w2D!=w2->end(); ++w2D){
-    if (fabs(w2D->pdgId())==24) continue;
-    if (muW2 == 0 && fabs(w2D->pdgId())==13) {
-      for (unsigned int dau = 0; dau < w2D->numberOfDaughters(); dau++){
-	if(w2D->daughter(dau)->pdgId() == w2D->pdgId() &&  w2D->daughter(dau)->status()==1) muW2 = &*(w2D->daughter(dau));
+    
+    if (w1 == 0 || w2==0) {
+      cout << __LINE__ << " No W in the event " << endl;
+      return ;
+    } 
+    for (Candidate::const_iterator w1D= w1->begin(); w1D!=w1->end(); ++w1D){
+      if (fabs(w1D->pdgId())==24) continue;
+      if (!w1D->daughter(0))continue;
+      if (muW1 == 0 && fabs(w1D->pdgId())==13){
+	for (unsigned int dau = 0; dau < w1D->numberOfDaughters(); dau++){
+	  if(w1D->daughter(dau)->pdgId() == w1D->pdgId() &&  w1D->daughter(dau)->status()==1) muW1 = &*(w1D->daughter(dau));
+	}
+      }
+      if (nuW1 == 0 && fabs(w1D->pdgId())==14){
+	for (unsigned int dau = 0; dau < w1D->numberOfDaughters(); dau++){
+	  if(w1D->daughter(dau)->pdgId() == w1D->pdgId() &&  w1D->daughter(dau)->status()==1) nuW1 = &*(w1D->daughter(dau));
+	} 
       }
     }
-    if (nuW2 == 0 && fabs(w2D->pdgId())==14){
-      for (unsigned int dau = 0; dau < w2D->numberOfDaughters(); dau++){
-	if( w2D->daughter(dau)->pdgId() == w2D->pdgId() &&  w2D->daughter(dau)->status()==1) nuW2 = &*(w2D->daughter(dau));
+    
+    for (Candidate::const_iterator w2D= w2->begin(); w2D!=w2->end(); ++w2D){
+      if (fabs(w2D->pdgId())==24) continue;
+      if (muW2 == 0 && fabs(w2D->pdgId())==13) {
+	for (unsigned int dau = 0; dau < w2D->numberOfDaughters(); dau++){
+	  if(w2D->daughter(dau)->pdgId() == w2D->pdgId() &&  w2D->daughter(dau)->status()==1) muW2 = &*(w2D->daughter(dau));
+	}
+      }
+      if (nuW2 == 0 && fabs(w2D->pdgId())==14){
+	for (unsigned int dau = 0; dau < w2D->numberOfDaughters(); dau++){
+	  if( w2D->daughter(dau)->pdgId() == w2D->pdgId() &&  w2D->daughter(dau)->status()==1) nuW2 = &*(w2D->daughter(dau));
+	}
       }
     }
-  }
-   //DeltaR muW1 muW2
-  if (muW1 == 0 ||  muW2 ==0) {
-    cout << __LINE__ << " No muons from Ws; " << muW1 << " mother of the mother: " <<w1->mother()->pdgId() << " " << muW2<< ", mother of the mother: " <<w2->mother()->pdgId()<< endl;
-    return;
-  }
+    //DeltaR muW1 muW2
+    if (muW1 == 0 ||  muW2 ==0) {
+      cout << __LINE__ << " No muons from Ws; " << muW1 << " mother of the mother: " <<w1->mother()->pdgId() << " " << muW2<< ", mother of the mother: " <<w2->mother()->pdgId()<< endl;
+      return;
+    }
+    
+    pair < double, double > wPt (w1->pt(),w2->pt()), wPx(w1->px(),w2->px()), wPy(w1->py(),w2->py()), wPz(w1->pz(),w2->pz()),
+      wEta(w1->eta(),w2->eta()), wPhi(w1->phi(),w2->phi()), wVtxX (w1->vx(),w2->vx()), wVtxY(w1->vy(),w2->vy()), 
+      wVtxZ(w1->vz(),w2->vz()), wMass(w1->mass(),w2->mass()), wE(w1->energy(),w2->energy()), wQ(w1->charge(),w2->charge()), 
+      wPdgId(w1->pdgId(),w2->pdgId());
 
-  pair < double, double > wPt (w1->pt(),w2->pt()), wPx(w1->px(),w2->px()), wPy(w1->py(),w2->py()), wPz(w1->pz(),w2->pz()),
-    wEta(w1->eta(),w2->eta()), wPhi(w1->phi(),w2->phi()), wVtxX (w1->vx(),w2->vx()), wVtxY(w1->vy(),w2->vy()), 
-    wVtxZ(w1->vz(),w2->vz()), wMass(w1->mass(),w2->mass()), wE(w1->energy(),w2->energy()), wQ(w1->charge(),w2->charge()), 
-    wPdgId(w1->pdgId(),w2->pdgId());
+    genWPt.push_back(wPt);
+    genWPx.push_back(wPx);
+    genWPy.push_back(wPy);
+    genWPz.push_back(wPz);
+    genWEta.push_back(wEta);
+    genWPhi.push_back(wPhi);
+    genWVtxX.push_back(wVtxX);
+    genWVtxY.push_back(wVtxY);
+    genWVtxZ.push_back(wVtxZ);
+    genWMass.push_back(wMass);
+    genWE.push_back(wE);
+    genWQ.push_back(wQ);
+    genWPdgId.push_back(wPdgId);
+    
+    pair < double, double > muPt (muW1->pt(),muW2->pt()), muPx(muW1->px(),muW2->px()), muPy(muW1->py(),muW2->py()), muPz(muW1->pz(),muW2->pz()),
+      muEta(muW1->eta(),muW2->eta()), muPhi(muW1->phi(),muW2->phi()), muVtxX (muW1->vx(),muW2->vx()), muVtxY(muW1->vy(),muW2->vy()), 
+      muVtxZ(muW1->vz(),muW2->vz()), muE(muW1->energy(),muW2->energy()), muQ(muW1->charge(),muW2->charge()), muPdgId(muW1->pdgId(),muW2->pdgId());
+    
+    genMuPt.push_back(muPt);
+    genMuPx.push_back(muPx);
+    genMuPy.push_back(muPy);
+    genMuPz.push_back(muPz);
+    genMuEta.push_back(muEta);
+    genMuPhi.push_back(muPhi);
+    genMuVtxX.push_back(muVtxX);
+    genMuVtxY.push_back(muVtxY);
+    genMuVtxZ.push_back(muVtxZ);
+    genMuE.push_back(muE);
+    genMuQ.push_back(muQ);
+    genMuPdgId.push_back(muPdgId);
+  }/// if higgs!=0
 
-  genWPt.push_back(wPt);
-  genWPx.push_back(wPx);
-  genWPy.push_back(wPy);
-  genWPz.push_back(wPz);
-  genWEta.push_back(wEta);
-  genWPhi.push_back(wPhi);
-  genWVtxX.push_back(wVtxX);
-  genWVtxY.push_back(wVtxY);
-  genWVtxZ.push_back(wVtxZ);
-  genWMass.push_back(wMass);
-  genWE.push_back(wE);
-  genWQ.push_back(wQ);
-  genWPdgId.push_back(wPdgId);
-
-  pair < double, double > muPt (muW1->pt(),muW2->pt()), muPx(muW1->px(),muW2->px()), muPy(muW1->py(),muW2->py()), muPz(muW1->pz(),muW2->pz()),
-    muEta(muW1->eta(),muW2->eta()), muPhi(muW1->phi(),muW2->phi()), muVtxX (muW1->vx(),muW2->vx()), muVtxY(muW1->vy(),muW2->vy()), 
-    muVtxZ(muW1->vz(),muW2->vz()), muE(muW1->energy(),muW2->energy()), muQ(muW1->charge(),muW2->charge()), muPdgId(muW1->pdgId(),muW2->pdgId());
-
-  genMuPt.push_back(muPt);
-  genMuPx.push_back(muPx);
-  genMuPy.push_back(muPy);
-  genMuPz.push_back(muPz);
-  genMuEta.push_back(muEta);
-  genMuPhi.push_back(muPhi);
-  genMuVtxX.push_back(muVtxX);
-  genMuVtxY.push_back(muVtxY);
-  genMuVtxZ.push_back(muVtxZ);
-  genMuE.push_back(muE);
-  genMuQ.push_back(muQ);
-  genMuPdgId.push_back(muPdgId);
-
+  // cout << __LINE__ << endl;
 
   const reco::Track* mutrk1=0 ;
   const reco::Track* mutrk2=0;
   double dRmin= 0.2;
-  for (reco::TrackCollection::const_iterator t= recoTracks->begin();t != recoTracks->end(); t++ ) {
-    double dR  = deltaR( muW1->phi(), muW1->eta(), t->phi(), t->eta());
-    if (dR<dRmin) {
-      dRmin=dR;
-      mutrk1 = &*t;
+  if (muW1 !=0 && muW2 !=0){
+    for (reco::TrackCollection::const_iterator t= recoTracks->begin();t != recoTracks->end(); t++ ) {
+      double dR  = deltaR( muW1->phi(), muW1->eta(), t->phi(), t->eta());
+      if (dR<dRmin) {
+	dRmin=dR;
+	mutrk1 = &*t;
+      }
     }
-  }
-  for (reco::TrackCollection::const_iterator t= recoTracks->begin();t != recoTracks->end(); t++ ) {
-    if (&*t == mutrk1) continue;
-    double dR  = deltaR( muW2->phi(), muW2->eta(), t->phi(), t->eta());
-    if (dR<dRmin) {
-      dRmin=dR;
-      mutrk2 = &*t;
+    for (reco::TrackCollection::const_iterator t= recoTracks->begin();t != recoTracks->end(); t++ ) {
+      if (&*t == mutrk1) continue;
+      double dR  = deltaR( muW2->phi(), muW2->eta(), t->phi(), t->eta());
+      if (dR<dRmin) {
+	dRmin=dR;
+	mutrk2 = &*t;
+      }
     }
-  }
+  }//muW1 !=0 && muW2 !=0
+
+  // cout << __LINE__ << endl;
 
   if (mutrk1 !=0 && mutrk2 !=0){
     pair <double, double > muHiggsPt (mutrk1->pt(),mutrk2->pt()), muHiggsPx (mutrk1->px(),mutrk2->px()), muHiggsPy (mutrk1->py(),mutrk2->py()), 
@@ -255,6 +266,8 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
     }
   }
   vector < const reco::Track* > muonRecoTracks;
+
+  // cout << __LINE__ << endl;
 
   for (unsigned int imu= 0; imu <muons.size(); imu++){
     const reco::Track *  trkTemp=0 ; 
@@ -300,6 +313,8 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
     }
   }//imu
 
+
+  // cout << __LINE__ << endl;
   ////////////////////////////////////////////////
   // Get L1Tracks from Pixel Digis and          //
   // start looking at relevant spectra and      //
@@ -332,7 +347,10 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
 //     cout << __LINE__ << iterL1Track->whichSeed() << " " << seedsuperlayer << endl;
       /// Select only L1Tracks with chosen seed
       if ( iterL1Track->whichSeed() != seedsuperlayer ) continue;
-      L1TrackFit iterL1TrackFit = iterL1Track->fitL1Track(true);
+      //      L1TrackFit iterL1TrackFit = iterL1Track->fitL1Track(true);
+      L1TrackFit iterL1TrackFit = iterL1Track->trickFitL1Track(true);
+
+
 //      cout << __LINE__ << endl;
      /// Select only Tracks matching VTX
       if ( fabs(iterL1TrackFit.getVertex().z()) >= 20.0 ) continue;
@@ -386,19 +404,23 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
       validL1Tracks++;
       L1Vector.push_back(&iterL1TrackFit);
 
-//     cout << __LINE__ << endl;
+      // cout << __LINE__ << endl;
 
       L1TrkQNoMatch.push_back(iterL1TrackFit.getCharge());
       L1TrkPtNoMatch.push_back(iterL1TrackFit.getMomentum().perp());
       L1TrkPxNoMatch.push_back(cos(iterL1TrackFit.getMomentum().phi())*iterL1TrackFit.getMomentum().perp());
       L1TrkPyNoMatch.push_back(sin(iterL1TrackFit.getMomentum().phi())*iterL1TrackFit.getMomentum().perp());
+      double tetha = 2.* atan(exp(-iterL1TrackFit.getMomentum().eta()));
+      double pz = iterL1TrackFit.getMomentum().perp()/tan(tetha);
       L1TrkPzNoMatch.push_back(pz);
       L1TrkEtaNoMatch.push_back(iterL1TrackFit.getMomentum().eta());
       L1TrkPhiNoMatch.push_back(iterL1TrackFit.getMomentum().phi());
-      // 	  L1TrkVtxX.push_back(iterL1TrackFit.getVertex().x());
-      // 	  L1TrkVtxY.push_back(iterL1TrackFit.getVertex().y());
+      L1TrkVtxXNoMatch.push_back(iterL1TrackFit.getVertex().x());
+      L1TrkVtxYNoMatch.push_back(iterL1TrackFit.getVertex().y());
       L1TrkVtxZNoMatch.push_back(iterL1TrackFit.getVertex().z());
       L1TrkIdNoMatch.push_back(iterL1Track->simTrkId());
+
+      // cout << __LINE__ << endl;
 
       /// Fit the Track already done in builder
       /// Compare with SimTracks (correlation)
@@ -408,10 +430,14 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
       /// Loop over SimTracks
       
 
+      // cout << __LINE__ << endl;
+
       SimTrackContainer::const_iterator iterSimTracks;
       for ( iterSimTracks = theSimTracks->begin();  iterSimTracks != theSimTracks->end();  ++iterSimTracks ) {
 	int vertexIndex = iterSimTracks->vertIndex();
 	const SimVertex& theSimVertex = (*theSimVtx)[vertexIndex];
+
+      // cout << __LINE__ << endl;
 
 	if ( iterL1Track->simTrkId() == iterSimTracks->trackId() ) {
 	  matchedL1Tracks++;
@@ -439,18 +465,27 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
 	  simTrkVtxZ.push_back(theSimVertex.position().z());
 	  simTrkId.push_back(iterSimTracks->trackId());
 
+      // cout << __LINE__ << endl;
+
 	  hL1TrackPt   -> Fill(iterL1TrackFit.getMomentum().perp());
+      // cout << __LINE__ << endl;
 	  hL1TrackPx   -> Fill(cos(iterL1TrackFit.getMomentum().phi())*iterL1TrackFit.getMomentum().perp());
 	  hL1TrackPy   -> Fill(sin(iterL1TrackFit.getMomentum().phi())*iterL1TrackFit.getMomentum().perp());
+      // cout << __LINE__ << endl;
 	  double tetha = 2.* atan(exp(-iterL1TrackFit.getMomentum().eta()));
 	  double pz = iterL1TrackFit.getMomentum().perp()/tan(tetha);
 	  //  	    double pz = - iterL1TrackFit->trkCharge() *iterL1TrackFit->Pt()/(iterL1TrackFit->fitRadius() * angcoeff);
 	  hL1TrackPz   -> Fill(pz);
+      // cout << __LINE__ << endl;
 	  hL1TrackEta  -> Fill(iterL1TrackFit.getMomentum().eta());
 	  hL1TrackPhi  -> Fill(iterL1TrackFit.getMomentum().phi());
+
+      // cout << __LINE__ << endl;
 // 	  hL1Trackvtxx -> Fill(iterL1TrackFit.getVertex().x());
 // 	  hL1Trackvtxy -> Fill(iterL1TrackFit.getVertex().y());
- 	  hL1Trackvtxz -> Fill(iterL1TrackFit.getVertex().z());
+ 
+      // cout << __LINE__ << endl;
+	  hL1Trackvtxz -> Fill(iterL1TrackFit.getVertex().z());
 	  hL1Trackq    -> Fill(iterL1TrackFit.getCharge());
 	  hDeltaTrackPt   -> Fill(iterSimTracks->momentum().pt()-iterL1TrackFit.getMomentum().perp());
 	  hDeltaTrackPx   -> Fill(iterSimTracks->momentum().px()-cos(iterL1TrackFit.getMomentum().phi())*iterL1TrackFit.getMomentum().perp());
@@ -480,9 +515,13 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
 	  L1TrkPz.push_back(pz);
 	  L1TrkEta.push_back(iterL1TrackFit.getMomentum().eta());
 	  L1TrkPhi.push_back(iterL1TrackFit.getMomentum().phi());
-// 	  L1TrkVtxX.push_back(iterL1TrackFit.getVertex().x());
-// 	  L1TrkVtxY.push_back(iterL1TrackFit.getVertex().y());
+      // cout << __LINE__ << endl;
+	  L1TrkVtxX.push_back(iterL1TrackFit.getVertex().x());
+      // cout << __LINE__ << endl;
+	  L1TrkVtxY.push_back(iterL1TrackFit.getVertex().y());
+      // cout << __LINE__ << endl;
 	  L1TrkVtxZ.push_back(iterL1TrackFit.getVertex().z());
+      // cout << __LINE__ << endl;
 	  L1TrkId.push_back(iterL1Track->simTrkId());
 
 	  continue;
@@ -492,6 +531,8 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
     hValidL1TracksvsL1Number->Fill(l1trackHandlePD->size(), validL1Tracks);
     hMatchedL1TracksvsL1Number->Fill(l1trackHandlePD->size(), matchedL1Tracks);
   } /// End of l1trackHandlePD->size() > 0
+
+      // cout << __LINE__ << endl;
   
   for (unsigned int imu=0 ; imu < muonRecoTracks.size() ; imu++ ) {
     hMuPt   -> Fill(muonRecoTracks[imu]->pt());
@@ -557,37 +598,38 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
   }
 
   dRmin = 0.2;   
-  for (unsigned int iL1Trk = 0; iL1Trk < L1Vector.size(); iL1Trk++){
-    for (unsigned int jL1Trk = 0; jL1Trk < L1Vector.size(); jL1Trk++){
-      if (iL1Trk == jL1Trk ) continue; 
-      double dR  = deltaR(L1Vector[iL1Trk]->getMomentum().phi(), L1Vector[iL1Trk]->getMomentum().eta(), L1Vector[jL1Trk]->getMomentum().phi(), L1Vector[jL1Trk]->getMomentum().eta());
-      double isoPt = 0; 
-      if (dR<0.3) {
-	isoPt=+ L1Vector[jL1Trk]->getMomentum().perp();
-      }
-      hL1IsoPtRel->Fill(isoPt/L1Vector[iL1Trk]->getMomentum().perp());
-      hL1IsoPt->Fill(isoPt);
-    }
-    hL1TrackNoMatchPt   -> Fill(L1Vector[iL1Trk]->getMomentum().perp());
-    hL1TrackNoMatchPx   -> Fill(cos(L1Vector[iL1Trk]->getMomentum().phi())*L1Vector[iL1Trk]->getMomentum().perp());
-    hL1TrackNoMatchPy   -> Fill(sin(L1Vector[iL1Trk]->getMomentum().phi())*L1Vector[iL1Trk]->getMomentum().perp());
-    double tetha = 2.* atan(exp(-L1Vector[iL1Trk]->getMomentum().eta()));
-    double pz = L1Vector[iL1Trk]->getMomentum().perp()/tan(tetha);
-    //  	    double pz = - L1Vector[iL1Trk]->trkCharge() *L1Vector[iL1Trk]->Pt()/(L1Vector[iL1Trk]->fitRadius() * angcoeff);
-    hL1TrackNoMatchPz   -> Fill(pz);
-    hL1TrackNoMatchEta  -> Fill(L1Vector[iL1Trk]->getMomentum().eta());
-    hL1TrackNoMatchPhi  -> Fill(L1Vector[iL1Trk]->getMomentum().phi());
+//   for (unsigned int iL1Trk = 0; iL1Trk < L1Vector.size(); iL1Trk++){
+//     for (unsigned int jL1Trk = 0; jL1Trk < L1Vector.size(); jL1Trk++){
+//       if (iL1Trk == jL1Trk ) continue; 
+//       double dR  = deltaR(L1Vector[iL1Trk]->getMomentum().phi(), L1Vector[iL1Trk]->getMomentum().eta(), L1Vector[jL1Trk]->getMomentum().phi(), L1Vector[jL1Trk]->getMomentum().eta());
+//       double isoPt = 0; 
+//       if (dR<0.3) {
+// 	isoPt=+ L1Vector[jL1Trk]->getMomentum().perp();
+//       }
+//       hL1IsoPtRel->Fill(isoPt/L1Vector[iL1Trk]->getMomentum().perp());
+//       hL1IsoPt->Fill(isoPt);
+//     }
+//     hL1TrackNoMatchPt   -> Fill(L1Vector[iL1Trk]->getMomentum().perp());
+//     hL1TrackNoMatchPx   -> Fill(cos(L1Vector[iL1Trk]->getMomentum().phi())*L1Vector[iL1Trk]->getMomentum().perp());
+//     hL1TrackNoMatchPy   -> Fill(sin(L1Vector[iL1Trk]->getMomentum().phi())*L1Vector[iL1Trk]->getMomentum().perp());
+//     double tetha = 2.* atan(exp(-L1Vector[iL1Trk]->getMomentum().eta()));
+//     double pz = L1Vector[iL1Trk]->getMomentum().perp()/tan(tetha);
+//     //  	    double pz = - L1Vector[iL1Trk]->trkCharge() *L1Vector[iL1Trk]->Pt()/(L1Vector[iL1Trk]->fitRadius() * angcoeff);
+//     hL1TrackNoMatchPz   -> Fill(pz);
+//     hL1TrackNoMatchEta  -> Fill(L1Vector[iL1Trk]->getMomentum().eta());
+//     hL1TrackNoMatchPhi  -> Fill(L1Vector[iL1Trk]->getMomentum().phi());
 
-    // 	    hL1TrackNoMatchvtxx -> Fill(L1Vector[iL1Trk]->fitVertex().x());
-    // 	    hL1TrackNoMatchvtxy -> Fill(L1Vector[iL1Trk]->fitVertex().y());
-    // 	    hL1TrackNoMatchvtxz -> Fill(L1Vector[iL1Trk]->fitVertex().z());
-    hL1TrackNoMatchq    -> Fill(L1Vector[iL1Trk]->getCharge());
+//     hL1TrackNoMatchvtxx -> Fill(L1Vector[iL1Trk]->gettVertex().x());
+//     hL1TrackNoMatchvtxy -> Fill(L1Vector[iL1Trk]->fitVertex().y());
+//     hL1TrackNoMatchvtxz -> Fill(L1Vector[iL1Trk]->fitVertex().z());
+//     hL1TrackNoMatchq    -> Fill(L1Vector[iL1Trk]->getCharge());
     
-  }
+//   }
   
 
   branch.simTrkQ= simTrkQ;
   branch.L1TrkQ= L1TrkQ;
+  branch.L1TrkQNoMatch= L1TrkQNoMatch;
   branch.recoTrkQ= recoTrkQ;
   branch.simTrkPdgId= simTrkPdgId;
   branch.genWQ= genWQ; 
@@ -642,6 +684,17 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
   branch.simTrkVtxY=simTrkVtxY;
   branch.simTrkVtxZ=simTrkVtxZ; 
   branch.simTrkId=simTrkId; 
+
+  branch.L1TrkPtNoMatch=L1TrkPtNoMatch; 
+  branch.L1TrkPxNoMatch=L1TrkPxNoMatch;
+  branch.L1TrkPyNoMatch=L1TrkPyNoMatch; 
+  branch.L1TrkPzNoMatch=L1TrkPzNoMatch; 
+  branch.L1TrkEtaNoMatch=L1TrkEtaNoMatch; 
+  branch.L1TrkPhiNoMatch=L1TrkPhiNoMatch;
+  branch.L1TrkVtxXNoMatch=L1TrkVtxXNoMatch;
+  branch.L1TrkVtxYNoMatch=L1TrkVtxYNoMatch;
+  branch.L1TrkVtxZNoMatch=L1TrkVtxZNoMatch;
+  branch.L1TrkIdNoMatch=L1TrkIdNoMatch; 
 
   branch.L1TrkPt=L1TrkPt; 
   branch.L1TrkPx=L1TrkPx;
@@ -936,6 +989,7 @@ void myL1TrackAnalyzerTree::beginJob(const edm::EventSetup& es)
 
   ntuple ->Branch("simTrkQ", &(branch.simTrkQ));
   ntuple -> Branch("L1TrkQ", &(branch.L1TrkQ));
+  ntuple -> Branch("L1TrkQNoMatch", &(branch.L1TrkQNoMatch));
   ntuple -> Branch("recoTrkQ", &(branch.recoTrkQ));
   ntuple -> Branch("simTrkPdgId", &(branch.simTrkPdgId));
   ntuple -> Branch("genWQ", &(branch.genWQ)); 
@@ -989,6 +1043,7 @@ void myL1TrackAnalyzerTree::beginJob(const edm::EventSetup& es)
   ntuple -> Branch("simTrkVtxY", &(branch.simTrkVtxY));
   ntuple -> Branch("simTrkVtxZ", &(branch.simTrkVtxZ)); 
   ntuple -> Branch("simTrkId", &(branch.simTrkId)); 
+
   ntuple -> Branch("L1TrkPt", &(branch.L1TrkPt)); 
   ntuple -> Branch("L1TrkPx", &(branch.L1TrkPx));
   ntuple -> Branch("L1TrkPy", &(branch.L1TrkPy)); 
@@ -998,7 +1053,18 @@ void myL1TrackAnalyzerTree::beginJob(const edm::EventSetup& es)
   ntuple -> Branch("L1TrkVtxX", &(branch.L1TrkVtxX));
   ntuple -> Branch("L1TrkVtxY", &(branch.L1TrkVtxY));
   ntuple -> Branch("L1TrkVtxZ", &(branch.L1TrkVtxZ));
-  ntuple -> Branch("L1TrkId", &(branch.L1TrkId)); 
+  ntuple -> Branch("L1TrkPtNoMatch", &(branch.L1TrkPtNoMatch)); 
+  ntuple -> Branch("L1TrkPxNoMatch", &(branch.L1TrkPxNoMatch));
+  ntuple -> Branch("L1TrkPyNoMatch", &(branch.L1TrkPyNoMatch)); 
+  ntuple -> Branch("L1TrkPzNoMatch", &(branch.L1TrkPzNoMatch)); 
+  ntuple -> Branch("L1TrkEtaNoMatch", &(branch.L1TrkEtaNoMatch)); 
+  ntuple -> Branch("L1TrkPhiNoMatch", &(branch.L1TrkPhiNoMatch));
+  ntuple -> Branch("L1TrkVtxXNoMatch", &(branch.L1TrkVtxXNoMatch));
+  ntuple -> Branch("L1TrkVtxYNoMatch", &(branch.L1TrkVtxYNoMatch));
+  ntuple -> Branch("L1TrkVtxZNoMatch", &(branch.L1TrkVtxZNoMatch));
+  ntuple -> Branch("L1TrkIdNoMatch", &(branch.L1TrkIdNoMatch)); 
+  ntuple -> Branch("L1TrkIdNoMatch", &(branch.L1TrkIdNoMatch)); 
+
   ntuple -> Branch("recoTrkPt", &(branch.recoTrkPt)); 
   ntuple -> Branch("recoTrkPx", &(branch.recoTrkPx));
   ntuple -> Branch("recoTrkPy", &(branch.recoTrkPy));

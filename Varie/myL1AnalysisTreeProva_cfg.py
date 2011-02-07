@@ -31,6 +31,8 @@ process = cms.Process("PATtemplate")
 # source files to feed the analyser
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1000)
+# define number of events to be processed (-1 means all)
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 
 process.source = cms.Source(
   "PoolSource",
@@ -45,7 +47,7 @@ process.source = cms.Source(
 "rfio:/castor/cern.ch/cms/store/caf/user/taroni/testVari/myHWW2mu2nu_7.root",
 "rfio:/castor/cern.ch/cms/store/caf/user/taroni/testVari/myHWW2mu2nu_8.root",
 "rfio:/castor/cern.ch/cms/store/caf/user/taroni/testVari/myHWW2mu2nu_9.root"
-
+##'file:muonPair_Longbarrel_2dClust_PixelrayMatch_NoPU_L1TrkTrig.root'
 )
 )
 #
@@ -77,14 +79,12 @@ process.load("SLHCUpgradeSimulations.Utilities.StackedTrackerGeometry_cfi")
 
 ###################################
 #
-# define number of events to be processed (-1 means all)
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000) )
 #
 # define some input tags for the analyzer used in this module
 process.PATtemplate = cms.EDAnalyzer("myL1TrackAnalyzerTree",
 ###process.PATtemplate = cms.EDAnalyzer("TestL1Track",
-  trackletVTX = cms.string("center"),
-##  trackletVTX = cms.string("offcenter"),
+##  trackletVTX = cms.string("center"),
+  trackletVTX = cms.string("offcenter"),
   seedSuperLayer = cms.int32(0),
   numberStubs = cms.int32(6),
   windowSize = cms.double(99.0),
