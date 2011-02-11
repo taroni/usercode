@@ -134,7 +134,8 @@
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorByChi2.h"
 #include "SimTracker/TrackAssociation/interface/TrackAssociatorByHits.h"
-
+#include "DataFormats/MuonReco/interface/Muon.h"
+#include "DataFormats/MuonReco/interface/MuonFwd.h"
 
 ///////////////
 // ROOT HEADERS
@@ -405,6 +406,7 @@ class myL1TrackAnalyzerTree : public edm::EDAnalyzer
 
 
   typedef  struct BRANCH { 
+    std::vector<bool> muRecoIsGlobal;
     std::vector<int> simTrkQ, L1TrkQ, recoTrkQ, simTrkPdgId, L1TrkQNoMatch;
     std::vector< pair <int, int > >genWQ, genMuQ, genWPdgId, genMuPdgId;
     std::vector<size_t> simTrkSize, L1TrkSize, recoTrkSize;
@@ -415,12 +417,12 @@ class myL1TrackAnalyzerTree : public edm::EDAnalyzer
       L1TrkPtNoMatch, L1TrkPxNoMatch,L1TrkPyNoMatch, L1TrkPzNoMatch, L1TrkEtaNoMatch, L1TrkPhiNoMatch, L1TrkVtxXNoMatch,L1TrkVtxYNoMatch,L1TrkVtxZNoMatch,L1TrkIdNoMatch, 
       recoTrkPt, recoTrkPx,recoTrkPy, recoTrkPz, recoTrkEta, recoTrkPhi, recoTrkVtxX,recoTrkVtxY,recoTrkVtxZ,recoTrkId,
       muRecoTrkPt, muRecoTrkPx, muRecoTrkPy, muRecoTrkPz, muRecoTrkEta, muRecoTrkPhi, muRecoTrkVtxX, muRecoTrkVtxY, muRecoTrkVtxZ, muRecoTrkId;
-
     std::vector< pair <double, double > > genWPt, genWPx,genWPy, genWPz, genWEta, genWPhi, genWVtxX,genWVtxY,genWVtxZ, genWMass, genWE,
       genMuPt, genMuPx,genMuPy, genMuPz, genMuEta, genMuPhi, genMuVtxX,genMuVtxY,genMuVtxZ, genMuE ,
       muHiggsRecoTrkPt, muHiggsRecoTrkPx, muHiggsRecoTrkPy, muHiggsRecoTrkPz, muHiggsRecoTrkEta, muHiggsRecoTrkPhi, muHiggsRecoTrkVtxX, muHiggsRecoTrkVtxY,
       muHiggsRecoTrkVtxZ, muHiggsRecoTrkId;
-      };
+    std::vector< pair <bool, bool > > muHiggsRecoIsGlobal;
+  };
 
   struct store_trks {
       int trkid;
