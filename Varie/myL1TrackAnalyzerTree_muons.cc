@@ -25,7 +25,7 @@ myL1TrackAnalyzerTree::~myL1TrackAnalyzerTree()
 // ANALYZE
 void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& es)
 {
-  std::vector<bool> muRecoIsGlobal;
+  std::vector<int> muRecoIsGlobal;
   std::vector<int> simTrkQ, L1TrkQ, recoTrkQ, simTrkPdgId, L1TrkQNoMatch;
   std::vector< pair <int, int > > genWQ, genMuQ, genWPdgId, genMuPdgId;
   std::vector<size_t> simTrkSize, L1TrkSize, recoTrkSize;
