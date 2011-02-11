@@ -421,7 +421,7 @@ class myL1TrackAnalyzerTree : public edm::EDAnalyzer
       genMuPt, genMuPx,genMuPy, genMuPz, genMuEta, genMuPhi, genMuVtxX,genMuVtxY,genMuVtxZ, genMuE ,
       muHiggsRecoTrkPt, muHiggsRecoTrkPx, muHiggsRecoTrkPy, muHiggsRecoTrkPz, muHiggsRecoTrkEta, muHiggsRecoTrkPhi, muHiggsRecoTrkVtxX, muHiggsRecoTrkVtxY,
       muHiggsRecoTrkVtxZ, muHiggsRecoTrkId;
-    std::vector< pair <bool, bool > > muHiggsRecoIsGlobal;
+    std::vector< pair <int, int > > muHiggsRecoIsGlobal;
   };
 
   struct store_trks {

@@ -41,7 +41,7 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
     genMuPt, genMuPx, genMuPy, genMuPz, genMuEta, genMuPhi, genMuVtxX, genMuVtxY, genMuVtxZ, genMuE,
     muHiggsRecoTrkPt, muHiggsRecoTrkPx, muHiggsRecoTrkPy, muHiggsRecoTrkPz, muHiggsRecoTrkEta, muHiggsRecoTrkPhi, muHiggsRecoTrkVtxX, muHiggsRecoTrkVtxY,
     muHiggsRecoTrkVtxZ, muHiggsRecoTrkId; 
-  std::vector < pair < bool, bool > > muHiggsRecoIsGlobal;
+  std::vector < pair <int, int > > muHiggsRecoIsGlobal;
 
   ///*** Fill Event NUmber Histogram
   h_EvtCnt->Fill(e.id().event()+0.2); /// The +0.2 is to be sure of being in the correct bin
@@ -273,7 +273,7 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
     muHiggsRecoTrkVtxX.push_back(muHiggsVx);
     muHiggsRecoTrkVtxY.push_back(muHiggsVy);
     muHiggsRecoTrkVtxZ.push_back(muHiggsVz);
-    pair < bool, bool > muHiggsIsGlobal(mu1Glb,mu2Glb);
+    pair < int, int > muHiggsIsGlobal(mu1Glb,mu2Glb);
     muHiggsRecoIsGlobal.push_back(muHiggsIsGlobal);
 
   }
@@ -748,7 +748,7 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
   branch.muRecoTrkVtxY=muRecoTrkVtxY;
   branch.muRecoTrkVtxZ=muRecoTrkVtxZ;
 
-//   branch.muHiggsRecoIsGlobal=muHiggsRecoIsGlobal;
+  branch.muHiggsRecoIsGlobal=muHiggsRecoIsGlobal;
   branch.muHiggsRecoTrkPx=muHiggsRecoTrkPx;
   branch.muHiggsRecoTrkPy=muHiggsRecoTrkPy;
   branch.muHiggsRecoTrkPz=muHiggsRecoTrkPz;
