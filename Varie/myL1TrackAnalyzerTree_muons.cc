@@ -25,7 +25,7 @@ myL1TrackAnalyzerTree::~myL1TrackAnalyzerTree()
 // ANALYZE
 void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& es)
 {
-  std::vector<int> muRecoIsGlobal;
+  std::vector<int> muRecoIsGlobal,muIsGlobal;
   std::vector<int> simTrkQ, L1TrkQ, recoTrkQ, simTrkPdgId, L1TrkQNoMatch;
   std::vector< pair <int, int > > genWQ, genMuQ, genWPdgId, genMuPdgId;
   std::vector<size_t> simTrkSize, L1TrkSize, recoTrkSize;
@@ -35,7 +35,8 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
     L1TrkPt, L1TrkPx, L1TrkPy, L1TrkPz, L1TrkEta, L1TrkPhi, L1TrkVtxX, L1TrkVtxY, L1TrkVtxZ, L1TrkId, 
     L1TrkPtNoMatch, L1TrkPxNoMatch, L1TrkPyNoMatch, L1TrkPzNoMatch, L1TrkEtaNoMatch, L1TrkPhiNoMatch, L1TrkVtxXNoMatch, L1TrkVtxYNoMatch, L1TrkVtxZNoMatch, L1TrkIdNoMatch, 
     recoTrkPt, recoTrkPx, recoTrkPy, recoTrkPz, recoTrkEta, recoTrkPhi, recoTrkVtxX, recoTrkVtxY,recoTrkVtxZ, recoTrkId,
-    muRecoTrkPt, muRecoTrkPx, muRecoTrkPy, muRecoTrkPz, muRecoTrkEta, muRecoTrkPhi, muRecoTrkVtxX, muRecoTrkVtxY, muRecoTrkVtxZ, muRecoTrkId;
+    muRecoTrkPt, muRecoTrkPx, muRecoTrkPy, muRecoTrkPz, muRecoTrkEta, muRecoTrkPhi, muRecoTrkVtxX, muRecoTrkVtxY, muRecoTrkVtxZ, muRecoTrkId,
+    muPt, muPx, muPy, muPz, muEta, muPhi, muVtxX, muVtxY, muVtxZ, muId;
 
   std::vector< pair <double, double > > genWPt, genWPx, genWPy, genWPz, genWEta, genWPhi, genWVtxX, genWVtxY, genWVtxZ, genWMass, genWE,
     genMuPt, genMuPx, genMuPy, genMuPz, genMuEta, genMuPhi, genMuVtxX, genMuVtxY, genMuVtxZ, genMuE,
@@ -291,13 +292,26 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
   // cout << __LINE__ << endl;
 
   for (reco::MuonCollection::const_iterator recoMu = recoMuons->begin(); recoMu != recoMuons->end(); recoMu++){
+
+    muIsGlobal.push_back(recoMu->isGlobalMuon ());
+    muPt.push_back(recoMu->pt());
+    muPx .push_back(recoMu->px());
+    muPy.push_back(recoMu->py());
+    muPz.push_back(recoMu->pz());
+    muEta.push_back(recoMu->eta());
+    muPhi.push_back(recoMu->phi());
+    muVtxX.push_back(recoMu->vx());
+    muVtxY.push_back(recoMu->vy());
+    muVtxZ.push_back(recoMu->vz());
+  
+
     const reco::Track *  trkTemp=0;
     if (!recoMu->track()) continue;
     trkTemp = &*(recoMu->track());
 
     
     if (trkTemp==0) continue;
-    if (muonRecoTracks.size()==0) {
+//     if (muonRecoTracks.size()==0) {
       muonRecoTracks.push_back(trkTemp);
       muRecoIsGlobal.push_back(recoMu->isGlobalMuon ());
       muRecoTrkPt.push_back(trkTemp->pt());
@@ -310,26 +324,26 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
       muRecoTrkVtxY.push_back(trkTemp->vy());
       muRecoTrkVtxZ.push_back(trkTemp->vz());
 //       muRecoTrkId.push_back(trkTemp->);
-    } else {
-      int trackCheck=0; 
-      for (unsigned int itrk =0; itrk <muonRecoTracks.size() ; itrk++){
-	if (muonRecoTracks[itrk] == trkTemp) trackCheck++; 
-      }
-      if( trackCheck == 0){
-	muonRecoTracks.push_back(trkTemp);
-	muRecoIsGlobal.push_back(recoMu->isGlobalMuon ());
-	muRecoTrkPt.push_back(trkTemp->pt());
-	muRecoTrkPx .push_back(trkTemp->px());
-	muRecoTrkPy.push_back(trkTemp->py());
-	muRecoTrkPz.push_back(trkTemp->pz());
-	muRecoTrkEta.push_back(trkTemp->eta());
-	muRecoTrkPhi.push_back(trkTemp->phi());
-	muRecoTrkVtxX.push_back(trkTemp->vx());
-	muRecoTrkVtxY.push_back(trkTemp->vy());
-	muRecoTrkVtxZ.push_back(trkTemp->vz());
-// 	muRecoTrkId.push_back(trkTemp);
-      }
-    }
+//     } else {
+//       int trackCheck=0; 
+//       for (unsigned int itrk =0; itrk <muonRecoTracks.size() ; itrk++){
+// 	if (muonRecoTracks[itrk] == trkTemp) trackCheck++; 
+//       }
+//       if( trackCheck == 0){
+// 	muonRecoTracks.push_back(trkTemp);
+// 	muRecoIsGlobal.push_back(recoMu->isGlobalMuon ());
+// 	muRecoTrkPt.push_back(trkTemp->pt());
+// 	muRecoTrkPx .push_back(trkTemp->px());
+// 	muRecoTrkPy.push_back(trkTemp->py());
+// 	muRecoTrkPz.push_back(trkTemp->pz());
+// 	muRecoTrkEta.push_back(trkTemp->eta());
+// 	muRecoTrkPhi.push_back(trkTemp->phi());
+// 	muRecoTrkVtxX.push_back(trkTemp->vx());
+// 	muRecoTrkVtxY.push_back(trkTemp->vy());
+// 	muRecoTrkVtxZ.push_back(trkTemp->vz());
+// // 	muRecoTrkId.push_back(trkTemp);
+//       }
+//     }
   }//recoMu
 
 
@@ -737,6 +751,17 @@ void myL1TrackAnalyzerTree::analyze(const edm::Event& e, const edm::EventSetup& 
   branch.recoTrkVtxZ=recoTrkVtxZ;
   branch.recoTrkId=recoTrkId;
 
+  branch.muIsGlobal=muIsGlobal;
+  branch.muPt=muPt;
+  branch.muPx=muPx;
+  branch.muPy=muPy;
+  branch.muPz=muPz;
+  branch.muEta=muEta;
+  branch.muPhi=muPhi;
+  branch.muVtxX=muVtxX;
+  branch.muVtxY=muVtxY;
+  branch.muVtxZ=muVtxZ;
+
   branch.muRecoIsGlobal=muRecoIsGlobal;
   branch.muRecoTrkPt=muRecoTrkPt;
   branch.muRecoTrkPx=muRecoTrkPx;
@@ -1095,6 +1120,17 @@ void myL1TrackAnalyzerTree::beginJob(const edm::EventSetup& es)
   ntuple -> Branch("recoTrkVtxY", &(branch.recoTrkVtxY));
   ntuple -> Branch("recoTrkVtxZ", &(branch.recoTrkVtxZ));
   ntuple -> Branch("recoTrkId", &(branch.recoTrkId));
+
+  ntuple -> Branch("muIsGlobal",   &(branch.muIsGlobal)); 
+  ntuple -> Branch("muPt",   &(branch.muPt)); 
+  ntuple -> Branch("muPx",   &(branch.muPx));
+  ntuple -> Branch("muPy",   &(branch.muPy));
+  ntuple -> Branch("muPz",   &(branch.muPz)); 
+  ntuple -> Branch("muEta",  &(branch.muEta)); 
+  ntuple -> Branch("muPhi",  &(branch.muPhi)); 
+  ntuple -> Branch("muVtxX", &(branch.muVtxX));
+  ntuple -> Branch("muVtxY", &(branch.muVtxY));
+  ntuple -> Branch("muVtxZ", &(branch.muVtxZ));
 
   ntuple -> Branch("muRecoIsGlobal",   &(branch.muRecoIsGlobal)); 
   ntuple -> Branch("muRecoTrkPt",   &(branch.muRecoTrkPt)); 
