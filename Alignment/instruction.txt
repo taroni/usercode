@@ -1,0 +1,54 @@
+to get the package:
+    cvs co UserCode/STaroni/Alignment
+
+Files in the Package:
+
+      src: directory containing the analyzer code 
+
+      test: directory containing the configuration file to run the code
+      
+      triggerMacro: directory containing the macro to analyze the trigger
+
+      plotMacro: directory containing the macro to plot the result of the analyzer
+      BuildFile.xml: usual CMSSW buildfile to compile the analyzer
+
+-----
+SRC:
+
+	NewTrackAnalyzer.cc     Analyzer for the DiMuonResonances. It produce histograms. It run on the RECO data and also plot information on isolation. It has to be used with a cfg like /UserCode/STaroni/Alignment/test/myOnia_noIso_cfg.py
+
+	TrackAnalyzerNewTwoBodyHisto.cc      Analyzer for the DiMuonResonances. It produce histograms. It run on the ALCARECO data. cfg example /UserCode/STaroni/Alignment/test/myUpsilonMuMu_Analisys_cfg.py
+
+	TrackAnalyzerNewTwoBody.cc	Analyzer for the DiMuonResonances. It produce a ROOTtree with the saved variables. It run on the ALCARECO data
+	TrackAnalyzerHisto.cc    Analyzer for tracks, for MuonIsolated or MinBias stream. It produce histograms. It run on the ALCARECO data
+
+	TrackAnalyzer.cc	Analyzer for tracks, for MuonIsolated or MinBias stream. It produce a ROOTtree with the saved variables. It run on the ALCARECO data
+	
+
+
+----
+TEST:
+
+	myOnia_noIso_cfg.py cfg to run the /UserCode/STaroni/Alignment/src/NewTrackAnalyzer.cc analyzer.
+	UpsilonNoIso.cfg crab cfg to Use crab to run myOnia_noIso_cfg.py files are saved in eos in the cafuser space with the correct permissions.
+
+	myOniaLaunch.py script to launch in sequence many job on the cafqueues
+	kill.py python script to kill the jobs in the queues
+
+	myUpsilonMuMu_Analisys_cfg.py  cfg to run the /UserCode/STaroni/Alignment/src/TrackAnalyzerNewTwoBodyHisto.cc
+
+----
+plotMacro
+
+	macro to plot the ROOT Tree content: (thet should work fine but I haven't use it recently, if the source files are at caf its faster run directly the histo analyzer)
+	      myMass.C
+	      newhisto3.C
+	      newhistoNoResonance.C
+	  
+
+	macro to plot the Histos:
+		plotMass.C
+		compareZ.C
+		compareMinBias.C
+		compareMuIso.C
+		plotAllMass.C
