@@ -45,7 +45,7 @@ process.maxEvents = cms.untracked.PSet(
 ## ##     'file:/afs/cern.ch/cms/CAF/CMSALCA/ALCA_TRACKERALIGN2/HIP/taroni/validation/CMSSW_4_4_2_patch8/src/Alignment/CommonAlignmentProducer/test/muOnia_002C4A3A-751A-E111-B47D-00304867C0EA.root'
 ##     )
 ## )
-process.source = cms.Source (\"PoolSource\",fileNames =  cms.untracked.vstring())
+process.source = cms.Source (\"PoolSource\",fileNames =  cms.untracked.vstring(), skipBadFiles = cms.untracked.bool(True))
 process.source.fileNames = []
 
 process.options = cms.untracked.PSet(
@@ -214,7 +214,7 @@ for ii in mf:
             cp $FILELIST .
 
             cd $W_DIR
-            setenv SCRAM_ARCH slc5_ia32_gcc434
+
             eval `scramv1 runtime -csh`
             cd -
             cmsRun $CFG
@@ -231,8 +231,8 @@ for ii in mf:
     sh_file.close()
 
     #sottomette script
-##     popen("chmod a+x QCD100-"+str(i)+".sh" )
-##     popen("bsub -q cmscaf1nw QCD100-"+str(i)+".sh" )
+    popen("chmod a+x onia-"+str(i)+".sh" )
+    popen("bsub -q cmscaf1nh onia-"+str(i)+".sh" )
     
     i+=1
 
