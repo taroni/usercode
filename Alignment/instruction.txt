@@ -52,3 +52,7 @@ plotMacro
 		compareMinBias.C
 		compareMuIso.C
 		plotAllMass.C
+
+	macro to fit  the mass distribution and the background with a gaussian + polinomial 
+	gaussYield.cc
+	gaussYieldBin.cc
