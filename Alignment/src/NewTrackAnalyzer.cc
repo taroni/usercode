@@ -256,13 +256,13 @@ class NewTrackAnalyzer : public edm::EDAnalyzer {
       double R =0;
       for (reco::TrackCollection::const_iterator track1=track+1; track1!=tC.end(); track1++){
 	TLorentzVector track01(track1->px(),track1->py(),track1->pz(),sqrt((track1->p()*track1->p())+(0.105*0.105)));
-      if (DEBUG) cout << __LINE__ << endl;
+	if (DEBUG) cout << __LINE__ << endl;
 	mother=track0+track01;
-      if (DEBUG) cout << __LINE__ << endl;
+	if (DEBUG) cout << __LINE__ << endl;
 	InvMass=mother.M();
 // 	if (MultCand==1) cout << __LINE__ << " " << InvMass <<" " << theMaxMass << " " << theMinMass  << ", pt " << mother.Pt() << endl;
-      if (DEBUG) cout << __LINE__ << endl;
-// 	if (InvMass < theMaxMass && InvMass > theMinMass ) {
+	if (DEBUG) cout << __LINE__ << endl;
+	if (InvMass < theMaxMass && InvMass > theMinMass ) {
 	  if (DEBUG) cout << __LINE__ << endl;
 	  invMass.push_back(InvMass);
 	  if (DEBUG) cout << __LINE__ << endl;
@@ -301,7 +301,7 @@ class NewTrackAnalyzer : public edm::EDAnalyzer {
 	  hDeltaPhi -> Fill (deltaPhi);
  	  hDeltaEta -> Fill (deltaEta);
 	  hDeltaR   -> Fill (R) ;
-// 	}//invmass
+ 	}//invmass
 	if (DEBUG) cout << __LINE__ << endl;
 	
       }//TRACK1
