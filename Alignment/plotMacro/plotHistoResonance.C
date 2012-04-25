@@ -18,6 +18,7 @@ using namespace std;
 void plotHistoResonance(string resonance){
   gROOT->Reset();
   gROOT->SetStyle("Plain");
+  gStyle->SetHistLineWidth(2);
   gStyle->SetOptStat(1);
   gROOT->ForceStyle();
   stringstream file,file2;
