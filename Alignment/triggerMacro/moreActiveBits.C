@@ -1,3 +1,6 @@
+// TO RUN 
+//root [0] .L moreActiveBits.C+ 
+//root [1] moreActiveBits("outfile.root")
 #include "Riostream.h" 
 #include <memory>
 #include <math.h>
@@ -27,23 +30,6 @@ void moreActiveBits(string filename) {
   gStyle->SetOptStat(0);
 
   vector <TH1F*> vHisto;
-  
-  map<string, double > mapA1;
-  map<string, double > mapA2;
-  map<string, double > mapB;
-  map<string, double > mapC;
-  map<string, double > mapD;
-  map<string, double > mapE;
-  map<string, double > mapF;
-  
-  vector <map< string,double > > vMap;
-  vMap.push_back(mapA1);
-  vMap.push_back(mapA2);
-  vMap.push_back(mapB);
-  vMap.push_back(mapC);
-  vMap.push_back(mapD);
-  vMap.push_back(mapE);
-  vMap.push_back(mapF);
    
 
   TFile * f = new TFile();
@@ -79,7 +65,12 @@ void moreActiveBits(string filename) {
     vHisto.push_back(h);
 
   }
-  
+  fivefiledat << "TRIGGER EXCLUDED FROM THE LIST: Alca_*, *_Random*, *_Physics"  << endl; //to check every time
+  filedat << "TRIGGER EXCLUDED FROM THE LIST: Alca_*, *_Random*, *_Physics"  << endl; //to check every time
+  fivefiledat << "from oldest (first) to most recent (last) trigger key" << endl;
+  fivefiledat << endl;
+  filedat << "from oldest (first) to most recent (last) trigger key" << endl;
+  filedat <<  endl;
   for(unsigned int iHisto=0;iHisto<vHisto.size();iHisto++){
  
     fivefiledat << "#############################" << endl;
@@ -120,10 +111,16 @@ void moreActiveBits(string filename) {
     }//jt
     fivefiledat<< "\t" <<"evt/LS" << endl;
     filedat<< "\t" <<"evt/LS" << endl;
+    int mytrCount=0; 
     for (unsigned int itr = myTrigger.size()-1 ; itr != 0 ; itr--){
+      if (myTrigger[itr].first.substr(0,5) == "AlCa_" ) continue;
+      if (myTrigger[itr].first.substr(3,8) == "_Physics") continue;
+      if (myTrigger[itr].first.substr(3,7) == "_Random")continue;
       filedat<< "\t" << myTrigger[itr].second << " \t " <<  myTrigger[itr].first << endl;
-      if (itr < myTrigger.size()-6)continue;
+//       if (itr < myTrigger.size()-11)continue;
+      if (mytrCount> 10 )continue;
       fivefiledat<< "\t" << myTrigger[itr].second << " \t " <<  myTrigger[itr].first << endl;
+      mytrCount++;
     }
     filedat << endl;
     fivefiledat << endl;
