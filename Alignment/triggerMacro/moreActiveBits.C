@@ -67,9 +67,9 @@ void moreActiveBits(string filename) {
   }
   fivefiledat << "TRIGGER EXCLUDED FROM THE LIST: Alca_*, *_Random*, *_Physics"  << endl; //to check every time
   filedat << "TRIGGER EXCLUDED FROM THE LIST: Alca_*, *_Random*, *_Physics"  << endl; //to check every time
-  fivefiledat << "from oldest (first) to most recent (last) trigger key" << endl;
+  fivefiledat << "from most recent (first) to oldest (last) trigger key" << endl;
   fivefiledat << endl;
-  filedat << "from oldest (first) to most recent (last) trigger key" << endl;
+  filedat << "from most recent (first) to oldest (last) trigger key" << endl;
   filedat <<  endl;
   for(unsigned int iHisto=0;iHisto<vHisto.size();iHisto++){
  

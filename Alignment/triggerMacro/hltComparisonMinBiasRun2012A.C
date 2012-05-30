@@ -50,6 +50,7 @@ void hltComparisonMinBiasRun2012A(){
   vector <string> vFileName;
   vector <TH1F *> vHisto;
 
+  //Change the following array with the correct lumisections
   int ievt[] {670, 1096, 664, 984, 583, 298, 985, 1594, 1439, 5051, 69, 0, 0, 0, 1251, 1221, 1309, 424, 2557, 1075, 347, 443, 743, 302};
   vector <double> evt;
 
@@ -67,21 +68,23 @@ void hltComparisonMinBiasRun2012A(){
   int maxChars=256;
   char line[maxChars];
   int ijson =-1; 
+  evt.clear();
   while (inputfile.good()){
     ijson++;
     inputfile.getline (line,256);	      
     cout << __LINE__ <<" " <<  line << endl;
     stringstream file; 
     file.str("");
+    if (strlen(line) == 0 ) continue; 
     file <<  line << "/DQM_V0001_R000100000__Validation__MinBias__ALCARECO.root";
     TFile *f = TFile::Open(file.str().c_str());
 //     stringstream filejson ; 
 //     filejson << ijson<<".json"; 
     
 
-
     if (!f) continue;
     TH1F*h0=openH1(f);
+    cout << __LINE__ << " file " << file.str() << " opened" << endl;
     if (h0->GetEntries() !=0){
       if (h0->GetBinContent(601)!=0) cout << "histo " << line << " has OVERFLOW " << endl;
       vFiles.push_back(f);
@@ -90,11 +93,13 @@ void hltComparisonMinBiasRun2012A(){
       map < string, double > map0;
       vMap.push_back(map0);
       evt.push_back(ievt[ijson]);  // an automatic determination of  lumisection need to be implemented
+ //      cout << "histo with "  << h0->GetEntries() << " entries for "  << ievt[ijson] << " lumisection " << endl;
+      if (ievt[ijson]==0) cout << "====> histo with zero lumisection" << endl;
     }
   }
 
   for (int i=0; i<evt.size(); i++)
-    cout << " " << evt[i];
+    cout  << evt[i]<< " ";
   cout << endl;
   
   vector < ofstream > vOut;
@@ -106,12 +111,12 @@ void hltComparisonMinBiasRun2012A(){
    
   for (unsigned int iHisto=0; iHisto<vhisto.size(); iHisto++){
     int nlabels= 0 ;
-//     cout << "---------- " << vhisto[iHisto]->GetName()<<" ---------" << vhisto.size() <<endl;
+//     cout<< "---------- " << vhisto[iHisto]->GetName()<<" ---------" << vhisto.size() <<endl;
     excltrigger << "--------------" << vhisto[iHisto]->GetName()<<" ---------" << endl;
     singlerate << "histo# " << iHisto <<  " --------------" << vhisto[iHisto]->GetName()<<" ---------" << endl;
     double avergRate=0;
     double npath =0;
-    for (int iL = 0; iL <vhisto[iHisto]->GetXaxis()->GetNbins(); iL++){
+    for (int iL = 1; iL <=vhisto[iHisto]->GetXaxis()->GetNbins(); iL++){
       nlabels++; 
       if ((string) vhisto[iHisto]->GetXaxis()->GetBinLabel(iL)=="")continue;
       if ((string) vhisto[iHisto]->GetXaxis()->GetBinLabel(iL)=="DQM_FEDIntegrity"){
@@ -134,16 +139,17 @@ void hltComparisonMinBiasRun2012A(){
      string str  = (vhisto[iHisto]->GetXaxis()->GetBinLabel(iL));
      found =str.find("_v");
      if (found<str.length()){ 
-       string sbstr=str.substr (0,str.length()-3);
-       if (vhisto[iHisto]->GetBinContent(iL)>0)cout << __LINE__ <<  " "<< found << "  "<< str <<" " <<  sbstr << " " << vhisto[iHisto]->GetBinContent(iL)<< endl;
+       string sbstr=str.substr (0,found);
+//        if (vhisto[iHisto]->GetBinContent(iL)>0)cout << __LINE__ <<  " "<< found << "  "<< str <<" " <<  sbstr << " " << vhisto[iHisto]->GetBinContent(iL)<< endl;
        str=sbstr;
        vhisto[iHisto]->GetXaxis()->SetBinLabel(iL, sbstr.c_str());
+       if (vhisto[iHisto]->GetBinContent(iL)<=0) continue;      
+       singlerate << "histo# " << iHisto << " " << iL << " "  << (string)vhisto[iHisto]->GetXaxis()->GetBinLabel(iL) << " " << (double)(vhisto[iHisto]->GetBinContent(iL))/evt[iHisto] 
+		  << " " << vhisto[iHisto]->GetBinContent(iL) << " " <<evt[iHisto] <<   endl;
+       vMap[iHisto].insert( pair < string, double > ((string)vhisto[iHisto]->GetXaxis()->GetBinLabel(iL),(double)(vhisto[iHisto]->GetBinContent(iL))/(evt[iHisto])));
+       avergRate += (double)(vhisto[iHisto]->GetBinContent(iL))/evt[iHisto];
+       npath++;
      }
-     if (vhisto[iHisto]->GetBinContent(iL)<=0) continue;      
-     singlerate << "histo# " << iHisto << " " << (string)vhisto[iHisto]->GetXaxis()->GetBinLabel(iL) << " " << (double)(vhisto[iHisto]->GetBinContent(iL))/evt[iHisto] << endl;
-     vMap[iHisto].insert( pair < string, double > ((string)vhisto[iHisto]->GetXaxis()->GetBinLabel(iL),(double)(vhisto[iHisto]->GetBinContent(iL))/(evt[iHisto])));
-     avergRate += (double)(vhisto[iHisto]->GetBinContent(iL))/evt[iHisto];
-     npath++;
     }
     if (npath !=0) rateFile << vhisto[iHisto]->GetName() <<" average Rate " << avergRate << endl;
   }    
