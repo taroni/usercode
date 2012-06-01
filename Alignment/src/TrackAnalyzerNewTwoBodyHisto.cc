@@ -90,6 +90,11 @@ class TrackAnalyzerNewTwoBodyHisto : public edm::EDAnalyzer {
   TH1D *hEtaPlus; 
   TH1D *hEtaMinus;
   TH1D *hPhi;
+  TH1D * hPhiDT;
+  TH1D * hPhiRPCPlus;
+  TH1D * hPhiRPCMinus;
+  TH1D * hPhiCSCPlus;
+  TH1D * hPhiCSCMinus;
   TH1D *hPhiPlus;
   TH1D *hPhiMinus;
 
@@ -267,6 +272,11 @@ class TrackAnalyzerNewTwoBodyHisto : public edm::EDAnalyzer {
       hchi2->Fill(track->normalizedChi2());
       hEta->Fill(track->eta());
       hPhi->Fill(track->phi());
+      if (fabs(track->eta() ) < 0.8 )  hPhiDT->Fill(track->phi());
+      if (track->eta()>0.8 && track->eta()  < 1.4 )  hPhiRPCPlus->Fill(track->phi());
+      if (track->eta()<-0.8 && track->eta() >- 1.4 )  hPhiRPCMinus->Fill(track->phi());
+      if (track->eta()>1.4) hPhiCSCPlus->Fill(track->phi());
+      if (track->eta()<-1.4) hPhiCSCMinus->Fill(track->phi());
       hd0->Fill(track->d0());
       hvx->Fill(track->vx());
       hvy->Fill(track->vy());
@@ -308,6 +318,11 @@ class TrackAnalyzerNewTwoBodyHisto : public edm::EDAnalyzer {
     hHit=fs->make<TH1D>("hHit","Number of hit",30,0,30);
     hEta=fs->make<TH1D>("hEta","Eta",100,-4.,4.);
     hPhi=fs->make<TH1D>("hPhi","Phi",100,-4.,4.);
+    hPhiDT=fs->make<TH1D>("hPhiDT","hPhiDT",100,-4.,4.);
+    hPhiRPCPlus=fs->make<TH1D>("hPhiRPCPlus","hPhiRPCPlus",100,-4.,4.);
+    hPhiRPCMinus=fs->make<TH1D>("hPhiRPCMinus","hPhiRPCMinus",100,-4.,4.);
+    hPhiCSCPlus=fs->make<TH1D>("hPhiCSCPlus","hPhiCSCPlus",100,-4.,4.);
+    hPhiCSCMinus=fs->make<TH1D>("hPhiCSCMinus","hPhiCSCMinus",100,-4.,4.);
     hvx  =fs->make<TH1D>("hvx"  ,"hvx"  ,100,0.,.5);
     hvy  =fs->make<TH1D>("hvy"  ,"hvy"  ,100,0.,.5);
     hvz  =fs->make<TH1D>("hvz"  ,"hvz"  ,100,-10.,10.);
