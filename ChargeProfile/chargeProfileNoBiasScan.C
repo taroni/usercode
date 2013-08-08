@@ -47,7 +47,7 @@ void chargeProfileNoBiasScan(string filename="lorentzangleALCARECO.root",  bool 
   TCanvas * c= new TCanvas(); 
   c->Draw(); 
   for (int ilayer = 1; ilayer<4; ilayer ++){
-    for (int imodule = 1; imodule<8; imodule++){
+    for (int imodule = 1; imodule<9; imodule++){
       file->cd(); 
       stringstream name; 
       name.str(""); 

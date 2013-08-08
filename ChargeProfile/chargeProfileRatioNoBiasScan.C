@@ -104,7 +104,7 @@ void chargeProfileRatioNoBiasScan(string filename="lorentzangleALCARECO.root",  
     for (int imodule=1; imodule < 5; imodule++) {
       if (DEBUG) cout <<__LINE__ << endl;
       name.str("");
-      name << "hratio_module"<< 8-imodule << "_module" << imodule << "_bias"<< bias; 
+      name << "hratio_module"<< 9-imodule << "_module" << imodule << "_bias"<< bias; 
       if (DEBUG) cout <<__LINE__ << endl;
 
       TH1D * hh = vHisto[8-imodule];
