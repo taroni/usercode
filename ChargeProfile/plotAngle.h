@@ -22,7 +22,7 @@
 #include <TStyle.h>
 #include <TCanvas.h>
 #include <TLegend.h>
-
+#include <TMath.h>
 // Header file for the classes stored in the TTree if any.
 
 // Fixed size dimensions of array or collections stored in the TTree if any.
@@ -124,7 +124,7 @@ public :
 #ifdef plotAngle_cxx
 plotAngle::plotAngle(TTree *tree) : fChain(0) 
 {
-  string filename = "lorentzangleMC.root";
+  string filename = "lorentzangleALCARECOMC.root";
   
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.

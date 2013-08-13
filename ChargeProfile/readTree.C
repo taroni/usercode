@@ -37,7 +37,21 @@ void readTree::Loop()
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
       Long64_t ientry = LoadTree(jentry);
       if (ientry < 0) break;
+
       nb = fChain->GetEntry(jentry);   nbytes += nb;
+    if (chi2/ndof > 2) continue;
+    if (clust_size_y < 4) continue;
+    if (clust_charge> 120) continue; 
+    double residual = TMath::Sqrt( (trackhit_x - rechit_x) * (trackhit_x - rechit_x) + (trackhit_y - rechit_y) * (trackhit_y - rechit_y) );
+    if (residual > 0.005) continue; 
+    bool large_pix = false;
+    for (int j = 0; j <  npix; j++){
+      int colpos = static_cast<int>(colpix[j]);
+      if (rowpix[j] == 0 || rowpix[j] == 79 || rowpix[j] == 80 || rowpix[j] == 159 || colpos % 52 == 0 || colpos % 52 == 51 ){
+	      large_pix = true;	
+      }
+    }//end of pix loop
+    if (large_pix== true) continue; 
       cout << nb << endl;
       // if (Cut(ientry) < 0) continue;
    }

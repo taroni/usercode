@@ -67,7 +67,7 @@ void LorentzFitNoBiasScan(string filename="lorentzangleALCARECO.root",  bool sav
       name<< "lorentzFit_layer"<< ilayer<< "_module"<< imodule<< "_bias_"<< bias; 
       h2y->SetTitle(name.str().c_str());
       h2y->SetName(name.str().c_str());
-      TF1 * f = new TF1 ("f", "pol1", -50, 300); 
+      TF1 * f = new TF1 ("f", "pol1",-500, 500);
       h2y->Fit("f", "R", "", 50, 250);
 	
       hAngle->Fill (imodule, f->GetParameter(1)); 

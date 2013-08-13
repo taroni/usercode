@@ -36,8 +36,10 @@ void compareRatioDataMC(){
 
   stringstream name; 
   int bias = 150; 
-  TFile * file1 = new TFile("chargeRatio_lorentzangleALCARECO.root", "READ"); 
-  TFile * file2 = new TFile("chargeRatio_lorentzangleALCARECOMC.root", "READ"); 
+//   TFile * file1 = new TFile("chargeRatio_lorentzangleALCARECO.root", "READ"); 
+//   TFile * file2 = new TFile("chargeRatio_lorentzangleALCARECOMC.root", "READ");
+   TFile * file1 = new TFile("chargeRatio_driftdepthRun208391.root", "READ"); 
+  TFile * file2 = new TFile("chargeRatio_driftdepth_MC.root", "READ"); 
  
   TCanvas * c = new TCanvas() ; 
   c->Draw() ; 
