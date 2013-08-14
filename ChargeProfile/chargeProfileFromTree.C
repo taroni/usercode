@@ -28,25 +28,33 @@ void chargeProfileFromTree::Loop(){
   int histoID = 0; 
 
   float width_ = 0.0285;
+  int mybias[]  = {300, 100, 70};
+  std::vector<int> vbias (mybias, (mybias + sizeof(mybias)/sizeof(int)));
 
   if (fChain == 0) return;
   stringstream name; 
   //  cout << __LINE__ << endl; 
   Long64_t nentries = fChain->GetEntriesFast();
-
+  bool biasbool = false; 
+  int oldbias = -99;
+  
   for (int ilayer =1; ilayer < 4; ilayer++) {
     for (int imodule =1; imodule < 9; imodule++){
+      for (unsigned int ibias = 0; ibias < vbias.size(); ibias++){
+	if (DEBUG)  cout << __LINE__ << endl; 
+
+	histoID = 10000*ilayer + 1000*imodule + vbias[ibias];
+	
       //  cout << __LINE__ << endl; 
 
-      histoID = 10*ilayer + imodule;
-      name.str(""); 
-      name << "h_drift_depth_adc_layer" << ilayer <<"_module"<< imodule<<"_bias_150";  
-      TH2F * hbeta = new TH2F (name.str().c_str(), name.str().c_str(), 200, -1000, 1000, 50, -100, 400);
-      name.str(""); 
-      name << "h_drift_depth_noadc_layer"  << ilayer <<"_module"<< imodule<<"_bias_150";  
-      TH2F * hbetanoadc = new TH2F (name.str().c_str(), name.str().c_str(), 200, -1000, 1000, 50, -100, 400);
-      mapDepthBeta[histoID] = hbeta; 
-      mapDepthBetaNoAdc[histoID] = hbetanoadc; 
+	name.str(""); 
+	name << "h_drift_depth_adc_layer" << ilayer <<"_module"<< imodule<<"_bias_"<< vbias[ibias];  
+	TH2F * hbeta = new TH2F (name.str().c_str(), name.str().c_str(), 200, -1000, 1000, 50, -100, 400);
+	name.str(""); 
+	name << "h_drift_depth_noadc_layer"  << ilayer <<"_module"<< imodule<<"_bias_"<< vbias[ibias];  
+	TH2F * hbetanoadc = new TH2F (name.str().c_str(), name.str().c_str(), 200, -1000, 1000, 50, -100, 400);
+	mapDepthBeta[histoID] = hbeta; 
+	mapDepthBetaNoAdc[histoID] = hbetanoadc; 
 
 //       name.str(""); 
 //       name << "h_drift_depth_adc_layer" << ilayer <<"_module"<< imodule;  
@@ -61,7 +69,7 @@ void chargeProfileFromTree::Loop(){
 
       
       //  cout << __LINE__ << endl; 
-
+      }//vbias
     }//module
   }//layer
 
@@ -95,7 +103,15 @@ void chargeProfileFromTree::Loop(){
       // if (Cut(ientry) < 0) continue;
     //  cout << nb << endl; 
     if ( (int) jentry/10000. == jentry/10000.) cout <<"Processing "<< jentry+1 <<"th entry" <<endl;
-    histoID = 10*layer + module;
+    if (bias != oldbias) {
+      biasbool = false;
+      for (unsigned int ibias=0; ibias < vbias.size() ; ibias++){
+	if (bias == vbias[ibias]) biasbool = true;
+	oldbias = bias; 
+      }
+    }
+    if (biasbool==false) continue;
+    histoID = 10000*layer + 1000*module + bias;
     for (int i = 0 ; i < npix ; i++){
 
       float dx = (xpix[i]  - (trackhit_x - width_/2. / TMath::Tan(trackhit_alpha))) * 10000.;
@@ -126,7 +142,9 @@ void chargeProfileFromTree::Loop(){
   leg->SetFillColor(0); 
   for (int ilayer =1; ilayer < 4; ilayer++) {
     for (int imodule =1; imodule < 9; imodule++){
-      histoID = 10*ilayer + imodule;
+      for (unsigned int ibias = 0; ibias < vbias.size(); ibias++){
+
+	histoID = 10000*ilayer + 1000*imodule + vbias[ibias];
 //       mapDepthBeta[histoID]->Divide(mapDepthBetaNoAdc[histoID]);
 //       mapDepthAbsBeta[histoID]->Divide(mapDepthAbsBetaNoAdc[histoID]);
       mapDepthBeta[histoID]->Write();
@@ -141,9 +159,9 @@ void chargeProfileFromTree::Loop(){
 //       name.str("");
 //       name << "depthvsabsbeta_layer"<< ilayer << "_imodule" << imodule <<".png";
 //       c->SaveAs(name.str().c_str());
-
-   }
-  }
+      }//bias
+    }//module
+  }//layer
   outfile->Close(); 
   
 }

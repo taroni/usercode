@@ -16,6 +16,8 @@
 #include <vector>
 #include <string>
 #include <map> 
+#include <iostream>
+#include <vector>
 
 #include <TH1.h>
 #include <TROOT.h>

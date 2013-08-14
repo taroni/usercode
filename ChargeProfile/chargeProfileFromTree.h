@@ -127,7 +127,7 @@ public :
 #ifdef chargeProfileFromTree_cxx
 chargeProfileFromTree::chargeProfileFromTree(TTree *tree) : fChain(0) 
 {
-  string filename = "lorentzangleMC.root";
+  string filename = "lorentzangleTree_all.root";
   
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.

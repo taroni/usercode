@@ -35,23 +35,29 @@ void dimensions::Loop()
    map<int, TH1F*> hsizex;
    map<int, TH1F*> hsizey;
    stringstream name;
-   
+   float width_ = 0.0285;
+   int mybias[]  = {300,100,70};
+   std::vector<int> vbias (mybias, (mybias + sizeof(mybias)/sizeof(int)));
+   bool biasbool = false; 
+   int oldbias = -99;
+
    for (int ilayer =1 ; ilayer < 4; ilayer++){
      for (int imodule =1; imodule < 9 ; imodule++){
-       int histoID=10*ilayer + imodule; 
-       name.str(""); 
-       name << "clusterSize_layer"<<ilayer<< "_module"<<imodule <<"_bias150"; 
-       TH1F * h = new TH1F (name.str().c_str(), name.str().c_str(), 100, 0, 100);
-       hsize[histoID]=h;
-       name.str(""); 
-       name << "clusterSizeX_layer"<<ilayer<< "_module"<<imodule <<"_bias150"; 
-       TH1F * hx = new TH1F (name.str().c_str(), name.str().c_str(), 100, 0, 100);
-       hsizex[histoID]=hx;
-       name.str(""); 
-       name << "clusterSizeY_layer"<<ilayer<< "_module"<<imodule <<"_bias150"; 
-       TH1F * hy = new TH1F (name.str().c_str(), name.str().c_str(), 100, 0, 100);
-       hsizey[histoID]=hy;
-
+      for (unsigned int ibias = 0; ibias < vbias.size(); ibias++){
+	int histoID = 10000*ilayer + 1000*imodule + vbias[ibias];
+	name.str(""); 
+	name << "clusterSize_layer"<<ilayer<< "_module"<<imodule <<"_bias"<< vbias[ibias]; 
+	TH1F * h = new TH1F (name.str().c_str(), name.str().c_str(), 100, 0, 100);
+	hsize[histoID]=h;
+	name.str(""); 
+	name << "clusterSizeX_layer"<<ilayer<< "_module"<<imodule <<"_bias"<< vbias[ibias]; 
+	TH1F * hx = new TH1F (name.str().c_str(), name.str().c_str(), 100, 0, 100);
+	hsizex[histoID]=hx;
+	name.str(""); 
+	name << "clusterSizeY_layer"<<ilayer<< "_module"<<imodule <<"_bias"<< vbias[ibias]; 
+	TH1F * hy = new TH1F (name.str().c_str(), name.str().c_str(), 100, 0, 100);
+	hsizey[histoID]=hy;
+      }
      }
    }
    
@@ -74,17 +80,22 @@ void dimensions::Loop()
       }
     }//end of pix loop
     if (large_pix==true) continue; 
+    if (bias != oldbias) {
+      biasbool = false;
+      for (unsigned int ibias=0; ibias < vbias.size() ; ibias++){
+	if (bias == vbias[ibias]) biasbool = true;
+	oldbias = bias; 
+      }
+    }
+    if (biasbool==false) continue;
+    int     histoID = 10000*layer + 1000*module + bias;
+
       //      std::cout << nb << endl;
-      for (int ilayer =1 ; ilayer < 4; ilayer++){
-	for (int imodule =1; imodule < 9 ; imodule++){
-	  int histoID= 10* ilayer+ imodule; 
-	  hsize[histoID] ->Fill (npix);
-	  hsizex[histoID] ->Fill(clust_size_x);
-	  hsizey[histoID] ->Fill(clust_size_y);
+
 	  
-	  
-	}//imodule
-      }//ilayer
+    hsize[histoID] ->Fill (npix);
+    hsizex[histoID] ->Fill(clust_size_x);
+    hsizey[histoID] ->Fill(clust_size_y);
    }
    
    TCanvas * canvas = new TCanvas(); 
@@ -94,25 +105,28 @@ void dimensions::Loop()
    outfile->cd(); 
    for (int ilayer =1 ; ilayer < 4; ilayer++){
      for (int imodule =1; imodule < 9 ; imodule++){
-	  int histoID= 10* ilayer+ imodule; 
+       for (unsigned int ibias = 0; ibias < vbias.size(); ibias++){
+	 int histoID = 10000*ilayer + 1000*imodule + vbias[ibias];
+	  
 
-       hsize[histoID] ->Draw();
-       name.str("");
-       name << "clusterSize_layer"<<ilayer<< "_module"<<imodule<< ".png";
-       canvas->SaveAs(name.str().c_str());
-       
-       hsizex[histoID] ->Draw();
-       name.str("");
-       name << "clusterSizeX_layer"<<ilayer<< "_module"<<imodule<< ".png";
-       canvas->SaveAs(name.str().c_str());
-       hsizey[histoID] ->Draw();
-       name.str("");
-       name << "clusterSizeY_layer"<<ilayer<< "_module"<<imodule<< ".png";
-       canvas->SaveAs(name.str().c_str());
-      
-       hsize[histoID] ->Write();
-       hsizex[histoID] ->Write();
-       hsizey[histoID] ->Write();
+	 hsize[histoID] ->Draw();
+	 name.str("");
+	 name << "clusterSize_layer"<<ilayer<< "_module"<<imodule<< ".png";
+	 canvas->SaveAs(name.str().c_str());
+	 
+	 hsizex[histoID] ->Draw();
+	 name.str("");
+	 name << "clusterSizeX_layer"<<ilayer<< "_module"<<imodule<< ".png";
+	 canvas->SaveAs(name.str().c_str());
+	 hsizey[histoID] ->Draw();
+	 name.str("");
+	 name << "clusterSizeY_layer"<<ilayer<< "_module"<<imodule<< ".png";
+	 canvas->SaveAs(name.str().c_str());
+	 
+	 hsize[histoID] ->Write();
+	 hsizex[histoID] ->Write();
+	 hsizey[histoID] ->Write();
+       }//bias
      }//ilayer
    }//imodule   
    // if (Cut(ientry) < 0) continue;

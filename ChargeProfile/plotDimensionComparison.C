@@ -61,6 +61,7 @@ void plotDimensionComparison(string file1, string file2){
       h->Scale(1./h->Integral());
       h1->Scale(1./h1->Integral());
       h->Draw("E");
+      h->GetXaxis()->SetRangeUser(0,50);
       h->Draw("EP");
       h->SetMarkerStyle(20);
       h->Draw("EP");
@@ -87,6 +88,7 @@ void plotDimensionComparison(string file1, string file2){
       hx->Scale(1./hx->Integral());
       hx1->Scale(1./hx1->Integral());
       hx->Draw("E");
+      hx->GetXaxis()->SetRangeUser(0,50);
       hx->Draw("EP");
       hx->SetMarkerStyle(20);
       hx->Draw("EP");
@@ -113,6 +115,7 @@ void plotDimensionComparison(string file1, string file2){
       hy->Scale(1./hy->Integral());
       hy1->Scale(1./hy1->Integral());
       hy->Draw("E");
+      hy->GetXaxis()->SetRangeUser(0,50);
       hy->Draw("EP");
       hy->SetMarkerStyle(20);
       hy->Draw("EP");

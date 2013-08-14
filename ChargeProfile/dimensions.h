@@ -124,7 +124,7 @@ dimensions::dimensions(TTree *tree) : fChain(0)
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
-  string filename = "lorentzangleMC.root";
+  string filename = "lorentzangleTree_all.root";
    if (tree == 0) {
      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject(filename.c_str());
       if (!f || !f->IsOpen()) {
