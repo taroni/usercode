@@ -161,9 +161,8 @@ void chargeProfileFromTree::Loop(){
       
       //     mapDepthBeta[histoID] ->Fill(drift, depth, adc[i]);
       if (layerbool[layer -1]==true ){
-	//double norm_charge =  adc[i] *sqrt(1.0/(1.0/pow(tan(trackhit_alpha),2)+1.0/pow(tan(trackhit_beta),2)+1.0));  
-	
-	//mapDepthBeta[histoID] ->Fill(drift, depth,norm_charge);
+	double mynorm_charge =  adc[i] *sqrt(1.0/(1.0/pow(tan(trackhit_alpha),2)+1.0/pow(tan(trackhit_beta),2)+1.0));  // pixeltree corrections
+	//	mapDepthBeta[histoID] ->Fill(drift, depth,mynorm_charge);
 	mapDepthBeta[histoID] ->Fill(drift, depth,adc[i]);
 	mapDepthBetaNoAdc[histoID] ->Fill(drift, depth);
       }
