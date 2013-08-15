@@ -30,14 +30,12 @@ void chargeProfileFromTree::Loop(){
   float width_ = 0.0285;
   int mybias[]  = {300, 100, 70};
   std::vector<int> vbias (mybias, (mybias + sizeof(mybias)/sizeof(int)));
-
-  if (fChain == 0) return;
-  stringstream name; 
-  //  cout << __LINE__ << endl; 
+  int oldbias = -99;
+  stringstream name ; 
   Long64_t nentries = fChain->GetEntriesFast();
   bool biasbool = false; 
-  int oldbias = -99;
-  
+  if (fChain == 0) return;
+
   for (int ilayer =1; ilayer < 4; ilayer++) {
     for (int imodule =1; imodule < 9; imodule++){
       for (unsigned int ibias = 0; ibias < vbias.size(); ibias++){
@@ -81,6 +79,8 @@ void chargeProfileFromTree::Loop(){
     if (ientry < 0) break;
     if (DEBUG) cout << __LINE__ << endl; 
     nb = fChain->GetEntry(jentry);   nbytes += nb;
+    if ( (int)(jentry/10000.) == jentry/10000.) cout <<"Processing "<< jentry+1 <<"th entry" <<endl;
+    
     if (DEBUG)cout << __LINE__ << " chi2/ndof " << chi2 << " " << ndof << " " << chi2/ndof<< endl;     
     if (chi2/ndof > 2) continue;
     if (clust_size_y < 4) continue;
@@ -102,7 +102,45 @@ void chargeProfileFromTree::Loop(){
 
       // if (Cut(ientry) < 0) continue;
     //  cout << nb << endl; 
-    if ( (int) jentry/10000. == jentry/10000.) cout <<"Processing "<< jentry+1 <<"th entry" <<endl;
+    bool layerbool[3] = {false, false, false}; 
+    if (vbias.size()>1) {
+      if (run == 208392){
+	layerbool[0] = true; 
+	layerbool[1] = false; 
+	layerbool[2] = false; 
+      }
+      if (DEBUG) cout << __LINE__ << " " << __PRETTY_FUNCTION__ << endl;
+    
+      if (run == 208393){
+	if ((orbit > 1511670 && orbit < 4102155) || (orbit > 4102155 && orbit < 6119516) || (orbit> 6119516 && orbit < 8504600) || 
+	  (orbit > 8504600 && orbit < 11338352) ||(orbit > 11338352 && orbit < 14205283)||  (orbit > 14205283 && orbit < 16640930)||(orbit > 16640930 && orbit < 18756493)||(orbit > 18756493 && orbit < 20815870)|| orbit < 20815870) {
+          layerbool[0] = true; 
+	  layerbool[1] = false; 
+	  layerbool[2] = false;
+        }else if (orbit >21140745&& orbit <50577268) {
+	  layerbool[0] = false; 
+	  layerbool[1] = true; 
+	  layerbool[2] = false;
+	} else if (orbit > 50825857) {
+	layerbool[0] = false; 
+	layerbool[1] = false; 
+	layerbool[2] = true;
+	}
+      }
+    
+      if (run == 208394 ||( run == 208395 && orbit < 19753949 )) {
+	layerbool[0] = false; 
+	layerbool[1] = false; 
+	layerbool[2] = true;
+      }
+    }else{
+      layerbool[0] = true; 
+      layerbool[1] = true; 
+      layerbool[2] = true;
+    }
+    
+  //  cout << __LINE__ << endl; 
+
     if (bias != oldbias) {
       biasbool = false;
       for (unsigned int ibias=0; ibias < vbias.size() ; ibias++){
@@ -113,16 +151,22 @@ void chargeProfileFromTree::Loop(){
     if (biasbool==false) continue;
     histoID = 10000*layer + 1000*module + bias;
     for (int i = 0 ; i < npix ; i++){
-
       float dx = (xpix[i]  - (trackhit_x - width_/2. / TMath::Tan(trackhit_alpha))) * 10000.;
       float dy = (ypix[i]  - (trackhit_y - width_/2. / TMath::Tan(trackhit_beta))) * 10000.;
+ //      cout <<__LINE__<< " "<<  dx << " " <<xpix[i]<< " "  << trackhit_x  << " " << width_/2 << " " <<  (trackhit_x - width_/2. / TMath::Tan(trackhit_alpha))<< endl; 
+//       cout <<__LINE__<< " "<< dy << " " << ypix[i]<< " " << trackhit_y  << " " << width_/2 <<" " <<  (trackhit_y - width_/2. / TMath::Tan(trackhit_beta)) << endl; 
       float depth = dy * tan(trackhit_beta);
       float drift = dx - dy * tan(trackhit_gamma_);
       
       
-      mapDepthBeta[histoID] ->Fill(drift, depth, adc[i]);
-      mapDepthBetaNoAdc[histoID] ->Fill(drift, depth);
-
+      //     mapDepthBeta[histoID] ->Fill(drift, depth, adc[i]);
+      if (layerbool[layer -1]==true ){
+	//double norm_charge =  adc[i] *sqrt(1.0/(1.0/pow(tan(trackhit_alpha),2)+1.0/pow(tan(trackhit_beta),2)+1.0));  
+	
+	//mapDepthBeta[histoID] ->Fill(drift, depth,norm_charge);
+	mapDepthBeta[histoID] ->Fill(drift, depth,adc[i]);
+	mapDepthBetaNoAdc[histoID] ->Fill(drift, depth);
+      }
     }
 
        

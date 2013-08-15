@@ -111,7 +111,7 @@ void plotDimensionComparisonBiasScan(string file1){
 	  leg->Draw(); 
 	  name.str("");
 	  name<< "clusterSizeX_layer" << ilayer<<"_module"<< imodule  << "_comparison.png";
-	  c->SaveAs(name.str().c_str());
+	  c2->SaveAs(name.str().c_str());
 	}
 
 	name.str("");
@@ -136,7 +136,7 @@ void plotDimensionComparisonBiasScan(string file1){
 	  leg->Draw(); 
 	  name.str("");
 	  name<< "clusterSizeY_layer" << ilayer<<"_module"<< imodule  << "_comparison.png";
-	  c->SaveAs(name.str().c_str());
+	  c3->SaveAs(name.str().c_str());
 	}
 
       }//bias
