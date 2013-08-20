@@ -82,10 +82,11 @@ void chargeProfileFromTree::Loop(){
     if ( (int)(jentry/10000.) == jentry/10000.) cout <<"Processing "<< jentry+1 <<"th entry" <<endl;
     
     if (DEBUG)cout << __LINE__ << " chi2/ndof " << chi2 << " " << ndof << " " << chi2/ndof<< endl;     
+    if (pt<3.) continue;
     if (chi2/ndof > 2) continue;
     if (clust_size_y < 4) continue;
     if (DEBUG) cout << __LINE__ << " clust_size_y "<< clust_size_y<< endl; 
-    if (clust_charge > 120) continue;
+    //    if (clust_charge > 120) continue;
     if (DEBUG)cout << __LINE__ << endl;  
     double residual = TMath::Sqrt( (trackhit_x - rechit_x) * (trackhit_x - rechit_x) + (trackhit_y - rechit_y) * (trackhit_y - rechit_y) );
     if (residual > 0.005) continue; 

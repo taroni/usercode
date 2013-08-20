@@ -29,8 +29,13 @@ void LorentzFitNoBiasScan(string filename="lorentzangleALCARECO.root",  bool sav
   gROOT->ForceStyle();
   gStyle->SetPadGridY(1); 
   gStyle->SetPadGridX(1); 
-  
-  int bias = 150; 
+  gStyle->SetFuncColor(2);
+  gStyle->SetFuncWidth(2);
+  gStyle->SetHistLineWidth(2);
+
+  //  int bias = 150; 
+  int mybias[]  = {300, 100, 70};
+  std::vector<int> vbias (mybias, (mybias + sizeof(mybias)/sizeof(int)));
   double pigreco = 3.141592;
   
   TFile * file = new TFile(filename.c_str(), "READ"); 
@@ -48,61 +53,75 @@ void LorentzFitNoBiasScan(string filename="lorentzangleALCARECO.root",  bool sav
     hNames.push_back(keyHisto->GetName());
   }
   TCanvas * c= new TCanvas("c","c"); 
-
+  c->Draw(); 
   stringstream name; 
   TLegend * leg = new TLegend (0.4, 0.12, 0.6, 0.22); 
   leg->SetFillColor(0); 
-  for (int ilayer = 1; ilayer<4; ilayer ++){
-    name.str(""); 
-    name << "tanLAvsModule_layer" << ilayer <<"_bias"<< bias ; 
-    TH1F * hAngle = new TH1F(name.str().c_str(), name.str().c_str(), 800, 0.5, 8.5);
-    for (int imodule = 1; imodule<9; imodule++){
-      file->cd(); 
+  for (unsigned int ibias = 0; ibias < vbias.size(); ibias++){
+    for (int ilayer = 1; ilayer<4; ilayer ++){
       name.str(""); 
-      name << "h_drift_depth_noadc_layer"<<ilayer<<"_module"<<imodule<< "_bias_"<< bias;
-      TH2F *h2 = (TH2F*) file->Get(name.str().c_str());
-      TProfile * h2y = (TProfile*) h2->ProfileY(); 
-      h2y->Sumw2(); 
-      name.str("");
-      name<< "lorentzFit_layer"<< ilayer<< "_module"<< imodule<< "_bias_"<< bias; 
-      h2y->SetTitle(name.str().c_str());
-      h2y->SetName(name.str().c_str());
-      TF1 * f = new TF1 ("f", "pol1",-500, 500);
-      h2y->Fit("f", "R", "", 50, 250);
-	
-      hAngle->Fill (imodule, f->GetParameter(1)); 
-      hAngle->SetBinError (hAngle->GetXaxis()->FindBin(imodule), f->GetParError(1)); 
-      outfile->cd();
-      h2y->Write();
-    }//imodule
-    outfile->cd(); 
-    hAngle->Write(); 
-    vHisto.push_back(hAngle); 
-  }//ilayer
-  for (int ilayer = 1; ilayer < 4; ilayer ++){
-    
-    if (ilayer==1) {
-      c->Clear(); 
-      vHisto[ilayer-1]->Draw("E"); 
-      vHisto[ilayer-1]->SetMarkerStyle(20);
-      vHisto[ilayer-1]->SetTitle("tanLAvsRing"); 
-    } else {
-      vHisto[ilayer-1]->Draw("ESAME");
-      vHisto[ilayer-1]->SetMarkerStyle(20); 
-      vHisto[ilayer-1]->SetMarkerColor(ilayer);	  
-    }
+      name << "tanLAvsModule_layer" << ilayer <<"_bias"<< mybias[ibias] ; 
+      TH1F * hAngle = new TH1F(name.str().c_str(), name.str().c_str(), 800, 0.5, 8.5);
+      for (int imodule = 1; imodule<9; imodule++){
+	file->cd(); 
+	name.str(""); 
+	name << "h_drift_depth_noadc_layer"<<ilayer<<"_module"<<imodule<< "_bias_"<< mybias[ibias];
+	TH2F *h2 = (TH2F*) file->Get(name.str().c_str());
+	TProfile * h2y = (TProfile*) h2->ProfileY(); 
+	h2y->Sumw2(); 
+	name.str("");
+	name<< "lorentzFit_layer"<< ilayer<< "_module"<< imodule<< "_bias_"<<  mybias[ibias]; 
+	h2y->SetTitle(name.str().c_str());
+	h2y->SetName(name.str().c_str());
+	TF1 * f = new TF1 ("f", "pol1",-500, 500);
+	h2y->Fit("f", "R", "", 50, 250);
+	h2y->GetYaxis()->SetRangeUser(-50, 150); 
+	hAngle->Fill (imodule, f->GetParameter(1)); 
+	hAngle->SetBinError (hAngle->GetXaxis()->FindBin(imodule), f->GetParError(1)); 
+	outfile->cd();
+	h2y->Write();
+	name.str(""); 
+	name<< "canvas/lorentzFit_layer"<< ilayer<< "_module"<< imodule<< "_bias_"<<  mybias[ibias]<<".png"; 
 
-    name.str("");
-    name << "layer "<< ilayer; 
-    leg->AddEntry(vHisto[ilayer-1], name.str().c_str(), "lpf");
-    c->Update();
-	
-    if (ilayer ==3)   leg->Draw();
-    
+	c->SaveAs(name.str().c_str());
 
-  }//ilayer
-  c->SaveAs("canvas/LorentzAnglevsRing.png");
-  c->Write(); 
+      }//imodule
+      outfile->cd(); 
+      hAngle->Write(); 
+      vHisto.push_back(hAngle); 
+    }//ilayer
+  }//ibias
+  for (unsigned int ibias = 0; ibias < vbias.size(); ibias++){
+    for (int ilayer = 1; ilayer < 4; ilayer ++){
+      
+      if (ilayer==1) {
+	c->Clear(); 
+	vHisto[ibias*3+ilayer-1]->Draw("E"); 
+	vHisto[ibias*3+ilayer-1]->GetYaxis()->SetRangeUser(0.2, 0.6); 
+	vHisto[ibias*3+ilayer-1]->SetMarkerStyle(20);
+	vHisto[ibias*3+ilayer-1]->SetTitle("tanLAvsRing"); 
+	
+      } else {
+	vHisto[ibias*3+ilayer-1]->Draw("ESAME");
+	vHisto[ibias*3+ilayer-1]->SetMarkerStyle(20); 
+	vHisto[ibias*3+ilayer-1]->SetMarkerColor(ilayer);	  
+      }
+      if (ibias == 0 ){
+	name.str("");
+	name << "layer "<< ilayer; 
+	leg->AddEntry(vHisto[ibias*3+ilayer-1], name.str().c_str(), "lpf");
+      }
+
+      c->Update();
+      
+      if (ilayer ==3)   leg->Draw();
+      
+    }//ilayer
+    name.str(""); 
+    name << "canvas/LorentzAnglevsRing_bias"<< vbias[ibias]<< ".png";
+    c->SaveAs(name.str().c_str());
+    c->Write(); 
+  }//ibias
 //   outfile->Close(); 
 //   file ->Close();
 
