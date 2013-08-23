@@ -35,6 +35,7 @@ void LorentzFitNoBiasScan(string filename="lorentzangleALCARECO.root",  bool sav
 
   //  int bias = 150; 
   int mybias[]  = {300, 100, 70};
+  //int mybias[]  = {150};
   std::vector<int> vbias (mybias, (mybias + sizeof(mybias)/sizeof(int)));
   double pigreco = 3.141592;
   
@@ -67,6 +68,7 @@ void LorentzFitNoBiasScan(string filename="lorentzangleALCARECO.root",  bool sav
 	name.str(""); 
 	name << "h_drift_depth_noadc_layer"<<ilayer<<"_module"<<imodule<< "_bias_"<< mybias[ibias];
 	TH2F *h2 = (TH2F*) file->Get(name.str().c_str());
+	h2->Rebin2D(2,2); 
 	TProfile * h2y = (TProfile*) h2->ProfileY(); 
 	h2y->Sumw2(); 
 	name.str("");
@@ -74,7 +76,7 @@ void LorentzFitNoBiasScan(string filename="lorentzangleALCARECO.root",  bool sav
 	h2y->SetTitle(name.str().c_str());
 	h2y->SetName(name.str().c_str());
 	TF1 * f = new TF1 ("f", "pol1",-500, 500);
-	h2y->Fit("f", "R", "", 50, 250);
+	h2y->Fit("f", "R", "", 100, 200);
 	h2y->GetYaxis()->SetRangeUser(-50, 150); 
 	hAngle->Fill (imodule, f->GetParameter(1)); 
 	hAngle->SetBinError (hAngle->GetXaxis()->FindBin(imodule), f->GetParError(1)); 

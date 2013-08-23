@@ -28,6 +28,7 @@ void chargeProfileFromTree::Loop(){
   int histoID = 0; 
 
   float width_ = 0.0285;
+  // int mybias[]  = {150};
   int mybias[]  = {300, 100, 70};
   std::vector<int> vbias (mybias, (mybias + sizeof(mybias)/sizeof(int)));
   int oldbias = -99;
@@ -82,11 +83,14 @@ void chargeProfileFromTree::Loop(){
     if ( (int)(jentry/10000.) == jentry/10000.) cout <<"Processing "<< jentry+1 <<"th entry" <<endl;
     
     if (DEBUG)cout << __LINE__ << " chi2/ndof " << chi2 << " " << ndof << " " << chi2/ndof<< endl;     
-    if (pt<3.) continue;
+    if (pt<1.) continue;
     if (chi2/ndof > 2) continue;
+    if (isHighPurity!=1) continue;
+    if (nhits<7) continue;
+    //  if (npixhits < 3 ) continue;
     if (clust_size_y < 4) continue;
     if (DEBUG) cout << __LINE__ << " clust_size_y "<< clust_size_y<< endl; 
-    //    if (clust_charge > 120) continue;
+    if (clust_charge > 120) continue;
     if (DEBUG)cout << __LINE__ << endl;  
     double residual = TMath::Sqrt( (trackhit_x - rechit_x) * (trackhit_x - rechit_x) + (trackhit_y - rechit_y) * (trackhit_y - rechit_y) );
     if (residual > 0.005) continue; 
@@ -166,6 +170,8 @@ void chargeProfileFromTree::Loop(){
 	//	mapDepthBeta[histoID] ->Fill(drift, depth,mynorm_charge);
 	mapDepthBeta[histoID] ->Fill(drift, depth,adc[i]);
 	mapDepthBetaNoAdc[histoID] ->Fill(drift, depth);
+	//	cout << bias << " "<<layerbool[0] << " " << layerbool[1]<< " " << layerbool[2]<< " "  << mapDepthBetaNoAdc[histoID] ->GetName() << endl; 
+    
       }
     }
 

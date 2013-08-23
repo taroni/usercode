@@ -34,7 +34,6 @@ const Int_t kMaxgamma = 1;
 
 class chargeProfileFromTree {
 public :
-  //   TFile          *f; 
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
 
@@ -47,6 +46,7 @@ public :
    Int_t           layer;
    Int_t           isflipped;
    Float_t         pt;
+   Float_t         p;
    Float_t         eta;
    Float_t         PV_vx;
    Float_t         PV_vy;
@@ -54,6 +54,8 @@ public :
    Float_t         phi;
    Double_t        chi2;
    Double_t        ndof;
+   Int_t           nhits;
+   Int_t           npixhits;
    Float_t         trackhit_x;
    Float_t         trackhit_y;
    Double_t        trackhit_alpha;
@@ -82,6 +84,9 @@ public :
    Int_t           clust_minPixelRow;
    Float_t         rechit_x;
    Float_t         rechit_y;
+   Int_t           trackQuality;
+   Int_t           nHitsPerTrack;
+   Int_t           isHighPurity;
    Int_t           bias;
 
    // List of branches
@@ -93,11 +98,14 @@ public :
    TBranch        *b_layer;   //!
    TBranch        *b_isflipped;   //!
    TBranch        *b_pt;   //!
+   TBranch        *b_p;   //!
    TBranch        *b_eta;   //!
    TBranch        *b_PV;   //!
    TBranch        *b_phi;   //!
    TBranch        *b_chi2;   //!
    TBranch        *b_ndof;   //!
+   TBranch        *b_nhits;   //!
+   TBranch        *b_npixhits;   //!
    TBranch        *b_trackhit;   //!
    TBranch        *b_simhit;   //!
    TBranch        *b_npix;   //!
@@ -109,6 +117,9 @@ public :
    TBranch        *b_ypix;   //!
    TBranch        *b_clust;   //!
    TBranch        *b_rechit;   //!
+   TBranch        *b_trackQuality;   //!
+   TBranch        *b_nHitsPerTrack;   //!
+   TBranch        *b_isHighPurity;   //!
    TBranch        *b_bias;   //!
 
    chargeProfileFromTree(TTree *tree=0);
@@ -128,7 +139,7 @@ public :
 chargeProfileFromTree::chargeProfileFromTree(TTree *tree) : fChain(0) 
 {
   string filename = "lorentzangleTree_all.root";
-  
+  //string filename = "lorentzangleALCARECO.root";
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
@@ -191,11 +202,14 @@ void chargeProfileFromTree::Init(TTree *tree)
    fChain->SetBranchAddress("layer", &layer, &b_layer);
    fChain->SetBranchAddress("isflipped", &isflipped, &b_isflipped);
    fChain->SetBranchAddress("pt", &pt, &b_pt);
+   fChain->SetBranchAddress("p", &p, &b_p);
    fChain->SetBranchAddress("eta", &eta, &b_eta);
    fChain->SetBranchAddress("PV", &PV_vx, &b_PV);
    fChain->SetBranchAddress("phi", &phi, &b_phi);
    fChain->SetBranchAddress("chi2", &chi2, &b_chi2);
    fChain->SetBranchAddress("ndof", &ndof, &b_ndof);
+   fChain->SetBranchAddress("nhits", &nhits, &b_nhits);
+   fChain->SetBranchAddress("npixhits", &npixhits, &b_npixhits);
    fChain->SetBranchAddress("trackhit", &trackhit_x, &b_trackhit);
    fChain->SetBranchAddress("simhit", &simhit_x, &b_simhit);
    fChain->SetBranchAddress("npix", &npix, &b_npix);
@@ -207,7 +221,12 @@ void chargeProfileFromTree::Init(TTree *tree)
    fChain->SetBranchAddress("ypix", ypix, &b_ypix);
    fChain->SetBranchAddress("clust", &clust_x, &b_clust);
    fChain->SetBranchAddress("rechit", &rechit_x, &b_rechit);
+   fChain->SetBranchAddress("trackQuality", &trackQuality, &b_trackQuality);
+   fChain->SetBranchAddress("nHitsPerTrack", &nHitsPerTrack, &b_nHitsPerTrack);
+   fChain->SetBranchAddress("isHighPurity", &isHighPurity, &b_isHighPurity);
    fChain->SetBranchAddress("bias", &bias, &b_bias);
+
+
    Notify();
 }
 
