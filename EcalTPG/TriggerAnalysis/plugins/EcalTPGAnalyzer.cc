@@ -826,7 +826,7 @@ void EcalTPGAnalyzer::analyze(const edm::Event& iEvent, const  edm::EventSetup &
     edm::Handle<EcalRecHitCollection> rechitsEB; 
     iEvent.getByLabel(EcalRecHitCollectionEB_, rechitsEB) ;
     //std::cout << " rechitsEB size " << rechitsEB.product()->size() << std::endl;
-
+    float maxRecHitEnergy = 0. ;
     if (rechitsEB.product()->size()!=0) {
         for ( EcalRecHitCollection::const_iterator rechitItr = rechitsEB->begin(); rechitItr != rechitsEB->end(); ++rechitItr ) {   
             EBDetId id = rechitItr->id(); 
@@ -836,8 +836,8 @@ void EcalTPGAnalyzer::analyze(const edm::Event& iEvent, const  edm::EventSetup &
             if (itTT != mapTower.end()) {
                 double theta = theBarrelGeometry_->getGeometry(id)->getPosition().theta() ;
                 (itTT->second).eRec_ += rechitItr->energy()*sin(theta) ;
-		//rh = &*rechitItr;
-		(itTT->second).sevlv_ = sevlv->severityLevel(id, *rechitsEB); 
+		if (maxRecHitEnergy < rechitItr->energy()*sin(theta) && rechitItr->energy()*sin(theta) > 1. )
+		  (itTT->second).sevlv_ = sevlv->severityLevel(id, *rechitsEB); 
 		//(itTT->second).sevlv = sevlv->severityLevel(*rh); 
 		cout << "severity level barrel " << sevlv->severityLevel(id, *rechitsEB) << endl; 
             }
