@@ -127,8 +127,19 @@ EcalTPGAnalyzer::EcalTPGAnalyzer(const edm::ParameterSet&  iConfig)
     tree_->Branch("rawTPEmul4", treeVariables_.rawTPEmul4,"rawTPEmul4[nbOfTowers]/I");//
     tree_->Branch("rawTPEmul5", treeVariables_.rawTPEmul5,"rawTPEmul5[nbOfTowers]/I");//
     tree_->Branch("eRec", treeVariables_.eRec,"eRec[nbOfTowers]/F");//
+    tree_->Branch("ttFlag", treeVariables_.ttFlag,"ttFlag[nbOfTowers]/I");//
     tree_->Branch("sevlv", treeVariables_.sevlv,"sevlv[nbOfTowers]/I");//
     tree_->Branch("spike", treeVariables_.spike,"spike[nbOfTowers]/I");//
+    tree_->Branch("rawTPEmulsFGVB1", treeVariables_.rawTPEmulsFGVB1,"rawTPEmulsFGVB1[nbOfTowers]/I");//
+    tree_->Branch("rawTPEmulsFGVB2", treeVariables_.rawTPEmulsFGVB2,"rawTPEmulsFGVB2[nbOfTowers]/I");//
+    tree_->Branch("rawTPEmulsFGVB3", treeVariables_.rawTPEmulsFGVB3,"rawTPEmulsFGVB3[nbOfTowers]/I");//
+    tree_->Branch("rawTPEmulsFGVB4", treeVariables_.rawTPEmulsFGVB4,"rawTPEmulsFGVB4[nbOfTowers]/I");//
+    tree_->Branch("rawTPEmulsFGVB5", treeVariables_.rawTPEmulsFGVB5,"rawTPEmulsFGVB5[nbOfTowers]/I");//
+    tree_->Branch("rawTPEmulttFlag1", treeVariables_.rawTPEmulttFlag1,"rawTPEmulttFlag1[nbOfTowers]/I");//
+    tree_->Branch("rawTPEmulttFlag2", treeVariables_.rawTPEmulttFlag2,"rawTPEmulttFlag2[nbOfTowers]/I");//
+    tree_->Branch("rawTPEmulttFlag3", treeVariables_.rawTPEmulttFlag3,"rawTPEmulttFlag3[nbOfTowers]/I");//
+    tree_->Branch("rawTPEmulttFlag4", treeVariables_.rawTPEmulttFlag4,"rawTPEmulttFlag4[nbOfTowers]/I");//
+    tree_->Branch("rawTPEmulttFlag5", treeVariables_.rawTPEmulttFlag5,"rawTPEmulttFlag5[nbOfTowers]/I");//
   
     treeShape_ = new TTree( "EcalShape","EcalShape" );
     treeShape_->Branch("evtNb",&treeVariablesShape_.evtNb,"evtNb/l"); //
@@ -700,6 +711,7 @@ void EcalTPGAnalyzer::analyze(const edm::Event& iEvent, const  edm::EventSetup &
         towerEner tE ;
         tE.iphi_ = TPtowid.iphi() ;
         tE.ieta_ = TPtowid.ieta() ;
+	tE.ttFlag_ = d[0].ttFlag();
         tE.tpgADC_ = (d[0].raw()&0xfff) ;
 	tE.twrADC = (d[0].raw()&0xff) ;
 	// if ((d[0].raw()&0xfff)!=0 ||  (d[0].raw()&0xff)!=0){
@@ -726,7 +738,11 @@ void EcalTPGAnalyzer::analyze(const edm::Event& iEvent, const  edm::EventSetup &
         const EcalTrigTowerDetId TPtowid= d.id();
         itTT = mapTower.find(TPtowid) ;
         if (itTT != mapTower.end())
-            for (int j=0 ; j<5 ; j++) (itTT->second).tpgEmul_[j] = (d[j].raw()&0xfff) ;
+	  for (int j=0 ; j<5 ; j++) {
+	    (itTT->second).tpgEmul_[j] = (d[j].raw()&0xfff) ;
+	    (itTT->second).tpgEmulFlag_[j] = d[j].ttFlag();
+	    (itTT->second).tpgEmulsFGVB_[j] = d[j].sFGVB();
+	  }
     }
 
     ///////////////////////////
@@ -839,7 +855,7 @@ void EcalTPGAnalyzer::analyze(const edm::Event& iEvent, const  edm::EventSetup &
 		if (maxRecHitEnergy < rechitItr->energy()*sin(theta) && rechitItr->energy()*sin(theta) > 1. )
 		  (itTT->second).sevlv_ = sevlv->severityLevel(id, *rechitsEB); 
 		//(itTT->second).sevlv = sevlv->severityLevel(*rh); 
-		cout << "severity level barrel " << sevlv->severityLevel(id, *rechitsEB) << endl; 
+		//cout << "severity level barrel " << sevlv->severityLevel(id, *rechitsEB) << endl; 
             }
           //  uint32_t sev = sevlv->severityLevel( id, *rechitsEB);
             //sevlv->severityLevel( id, *rechitsEB);
@@ -867,7 +883,7 @@ void EcalTPGAnalyzer::analyze(const edm::Event& iEvent, const  edm::EventSetup &
                 (itTT->second).eRec_ += rechitItr->energy()*sin(theta) ;
 		//rh = &*rechitItr;
 		(itTT->second).sevlv_ = sevlv->severityLevel(id, *rechitsEE); 
-		cout << "severity level endcap " << sevlv->severityLevel(id, *rechitsEE) << endl;
+		//cout << "severity level endcap " << sevlv->severityLevel(id, *rechitsEE) << endl;
             }
         }
     }
@@ -903,8 +919,19 @@ void EcalTPGAnalyzer::analyze(const edm::Event& iEvent, const  edm::EventSetup &
             treeVariables_.rawTPEmul3[towerNb] = (itTT->second).tpgEmul_[2] ;
             treeVariables_.rawTPEmul4[towerNb] = (itTT->second).tpgEmul_[3] ;
             treeVariables_.rawTPEmul5[towerNb] = (itTT->second).tpgEmul_[4] ;
+            treeVariables_.rawTPEmulttFlag1[towerNb] = (itTT->second).tpgEmulFlag_[0] ;
+            treeVariables_.rawTPEmulttFlag2[towerNb] = (itTT->second).tpgEmulFlag_[1] ;
+            treeVariables_.rawTPEmulttFlag3[towerNb] = (itTT->second).tpgEmulFlag_[2] ;
+            treeVariables_.rawTPEmulttFlag4[towerNb] = (itTT->second).tpgEmulFlag_[3] ;
+            treeVariables_.rawTPEmulttFlag5[towerNb] = (itTT->second).tpgEmulFlag_[4] ;
+            treeVariables_.rawTPEmulsFGVB1[towerNb] = (itTT->second).tpgEmulsFGVB_[0] ;
+            treeVariables_.rawTPEmulsFGVB2[towerNb] = (itTT->second).tpgEmulsFGVB_[1] ;
+            treeVariables_.rawTPEmulsFGVB3[towerNb] = (itTT->second).tpgEmulsFGVB_[2] ;
+            treeVariables_.rawTPEmulsFGVB4[towerNb] = (itTT->second).tpgEmulsFGVB_[3] ;
+            treeVariables_.rawTPEmulsFGVB5[towerNb] = (itTT->second).tpgEmulsFGVB_[4] ;
             treeVariables_.eRec[towerNb] = (itTT->second).eRec_ ;
             treeVariables_.sevlv[towerNb] = (itTT->second).sevlv_ ;
+            treeVariables_.ttFlag[towerNb] = (itTT->second).ttFlag_ ;
 	    
             treeVariables_.spike[towerNb] = (itTT->second).spike_ ;
 	    treeVariables_.twrADC[towerNb] =  (itTT->second).twrADC;

@@ -1,4 +1,4 @@
-
+#include <stdio.h>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -89,10 +89,22 @@ struct EcalTPGVariables
    int rawTPEmul3[4032] ;
    int rawTPEmul4[4032] ;
    int rawTPEmul5[4032] ;
-   float eRec[4032] ;
-   int spike[4032] ;
+  int rawTPEmulttFlag1[4032] ;
+  int rawTPEmulttFlag2[4032] ;
+  int rawTPEmulttFlag3[4032] ;
+  int rawTPEmulttFlag4[4032] ;
+  int rawTPEmulttFlag5[4032] ;
+  int rawTPEmulsFGVB1[4032] ;
+  int rawTPEmulsFGVB2[4032] ;
+  int rawTPEmulsFGVB3[4032] ;
+  int rawTPEmulsFGVB4[4032] ;
+  int rawTPEmulsFGVB5[4032] ;
+  
+  float eRec[4032] ;
+  int spike[4032] ;
   int sevlv[4032];
-   int trig_tower_adc[4032], trig_tower_sFGVB[4032]; 
+  int ttFlag[4032];
+  int trig_tower_adc[4032], trig_tower_sFGVB[4032]; 
 
    
    uint nMaskedRCT ;
@@ -159,8 +171,19 @@ void setBranchAddresses (TChain * chain, EcalTPGVariables & treeVars)
    chain->SetBranchAddress ("eRec",treeVars.eRec) ; 
    chain->SetBranchAddress ("spike",treeVars.spike) ;
    chain->SetBranchAddress ("sevlv", treeVars.sevlv);
+   chain->SetBranchAddress ("ttFlag", treeVars.ttFlag);
    chain->SetBranchAddress ("trig_tower_adc",treeVars.trig_tower_adc) ; 
    chain->SetBranchAddress ("trig_tower_sFGVB",treeVars.trig_tower_sFGVB) ; 
+   chain->SetBranchAddress ("rawTPEmulsFGVB1",treeVars.rawTPEmulsFGVB1) ; 
+   chain->SetBranchAddress ("rawTPEmulsFGVB2",treeVars.rawTPEmulsFGVB2) ; 
+   chain->SetBranchAddress ("rawTPEmulsFGVB3",treeVars.rawTPEmulsFGVB3) ; 
+   chain->SetBranchAddress ("rawTPEmulsFGVB4",treeVars.rawTPEmulsFGVB4) ; 
+   chain->SetBranchAddress ("rawTPEmulsFGVB5",treeVars.rawTPEmulsFGVB5) ; 
+   chain->SetBranchAddress ("rawTPEmulttFlag1",treeVars.rawTPEmulttFlag1) ; 
+   chain->SetBranchAddress ("rawTPEmulttFlag2",treeVars.rawTPEmulttFlag2) ; 
+   chain->SetBranchAddress ("rawTPEmulttFlag3",treeVars.rawTPEmulttFlag3) ; 
+   chain->SetBranchAddress ("rawTPEmulttFlag4",treeVars.rawTPEmulttFlag4) ; 
+   chain->SetBranchAddress ("rawTPEmulttFlag5",treeVars.rawTPEmulttFlag5) ; 
 
 
    
@@ -1054,6 +1077,11 @@ int main (int argc, char** argv)
    TPspectrumMap3DEEMinus->GetYaxis()->SetTitle("y index") ;
    TPspectrumMap3DEEMinus->GetXaxis()->SetTitle("x index") ;
    
+
+   TH1F * TPMatchttFlagEB = new TH1F("TPMatchttFlagEB", "Emulator ttFlag: Barrel", 10, 0, 10) ;
+   TPMatchttFlagEB->GetXaxis()->SetTitle("Flag code") ;
+   TH1F * ttFlagEB = new TH1F("ttFlagEB", "TP ttFlag: Barrel", 10, 0, 10) ;
+   ttFlagEB->GetXaxis()->SetTitle("Flag code") ;
    
    TH1F * TPMatchEmulEB = new TH1F("TPMatchEmulEB", "TP data matching Emulator: Barrel", 7, -1., 6) ;
    TPMatchEmulEB->GetXaxis()->SetTitle("Emulator Index") ;
@@ -1103,7 +1131,160 @@ int main (int argc, char** argv)
    TH3I * TPEmulMax3D_sevlv5 = new TH3I("TPEmulMax3D_sevlv5", "Index of max TP Emulator 3D, severity level 5 ", 72, 1, 73, 57, -28, 29, 7, -1, 6) ;
    TPEmulMax3D_sevlv5->GetYaxis()->SetTitle("eta index") ;
    TPEmulMax3D_sevlv5->GetXaxis()->SetTitle("phi index") ;
+
+
+   TH2I * TPNoMatchSmallDiff_1 = new TH2I("TPNoMatchSmallDiff_1", "TPNoMatchSmallDiff_1" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchSmallDiff_1->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchSmallDiff_1->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchSmallDiff_2 = new TH2I("TPNoMatchSmallDiff_2", "TPNoMatchSmallDiff_2" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchSmallDiff_2->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchSmallDiff_2->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchSmallDiff_3 = new TH2I("TPNoMatchSmallDiff_3", "TPNoMatchSmallDiff_3" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchSmallDiff_3->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchSmallDiff_3->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchSmallDiff_4 = new TH2I("TPNoMatchSmallDiff_4", "TPNoMatchSmallDiff_4" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchSmallDiff_4->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchSmallDiff_4->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchSmallDiff_5 = new TH2I("TPNoMatchSmallDiff_5", "TPNoMatchSmallDiff_5" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchSmallDiff_5->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchSmallDiff_5->GetXaxis()->SetTitle("phi index") ;
+
+   vector <TH2I *> TPNoMatchSmallDiff; 
+   TPNoMatchSmallDiff.push_back(TPNoMatchSmallDiff_1);
+   TPNoMatchSmallDiff.push_back(TPNoMatchSmallDiff_2);
+   TPNoMatchSmallDiff.push_back(TPNoMatchSmallDiff_3);
+   TPNoMatchSmallDiff.push_back(TPNoMatchSmallDiff_4);
+   TPNoMatchSmallDiff.push_back(TPNoMatchSmallDiff_5);
+
+   TH2I * TPNoMatchEmul0_1 = new TH2I("TPNoMatchEmul0_1", "TPNoMatchEmul0_1" , 72, 1, 73, 38, -19, 19) ;
+   TPNoMatchEmul0_1->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul0_1->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchEmul0_2 = new TH2I("TPNoMatchEmul0_2", "TPNoMatchEmul0_2" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul0_2->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul0_2->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchEmul0_3 = new TH2I("TPNoMatchEmul0_3", "TPNoMatchEmul0_3" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul0_3->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul0_3->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchEmul0_4 = new TH2I("TPNoMatchEmul0_4", "TPNoMatchEmul0_4" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul0_4->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul0_4->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchEmul0_5 = new TH2I("TPNoMatchEmul0_5", "TPNoMatchEmul0_5" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul0_5->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul0_5->GetXaxis()->SetTitle("phi index") ;
+
+   vector <TH2I *> TPNoMatchEmul0; 
+   TPNoMatchEmul0.push_back(TPNoMatchEmul0_1);
+   TPNoMatchEmul0.push_back(TPNoMatchEmul0_2);
+   TPNoMatchEmul0.push_back(TPNoMatchEmul0_3);
+   TPNoMatchEmul0.push_back(TPNoMatchEmul0_4);
+   TPNoMatchEmul0.push_back(TPNoMatchEmul0_5);
+
+   TH2I * TPNoMatchEmul0spikes_1 = new TH2I("TPNoMatchEmul0spikes_1", "TPNoMatchEmul0spikes_1" , 72, 1, 73, 38, -19, 19) ;
+   TPNoMatchEmul0spikes_1->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul0spikes_1->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchEmul0spikes_2 = new TH2I("TPNoMatchEmul0spikes_2", "TPNoMatchEmul0spikes_2" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul0spikes_2->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul0spikes_2->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchEmul0spikes_3 = new TH2I("TPNoMatchEmul0spikes_3", "TPNoMatchEmul0spikes_3" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul0spikes_3->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul0spikes_3->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchEmul0spikes_4 = new TH2I("TPNoMatchEmul0spikes_4", "TPNoMatchEmul0spikes_4" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul0spikes_4->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul0spikes_4->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchEmul0spikes_5 = new TH2I("TPNoMatchEmul0spikes_5", "TPNoMatchEmul0spikes_5" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul0spikes_5->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul0spikes_5->GetXaxis()->SetTitle("phi index") ;
+
+   vector <TH2I *> TPNoMatchEmul0spikes; 
+   TPNoMatchEmul0spikes.push_back(TPNoMatchEmul0spikes_1);
+   TPNoMatchEmul0spikes.push_back(TPNoMatchEmul0spikes_2);
+   TPNoMatchEmul0spikes.push_back(TPNoMatchEmul0spikes_3);
+   TPNoMatchEmul0spikes.push_back(TPNoMatchEmul0spikes_4);
+   TPNoMatchEmul0spikes.push_back(TPNoMatchEmul0spikes_5);
+
+   TH2I * TPNoMatchEmul255_1 = new TH2I("TPNoMatchEmul255_1", "TPNoMatchEmul255_1" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul255_1->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul255_1->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchEmul255_2 = new TH2I("TPNoMatchEmul255_2", "TPNoMatchEmul255_2" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul255_2->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul255_2->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchEmul255_3 = new TH2I("TPNoMatchEmul255_3", "TPNoMatchEmul255_3" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul255_3->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul255_3->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchEmul255_4 = new TH2I("TPNoMatchEmul255_4", "TPNoMatchEmul255_4" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul255_4->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul255_4->GetXaxis()->SetTitle("phi index") ;
+   TH2I * TPNoMatchEmul255_5 = new TH2I("TPNoMatchEmul255_5", "TPNoMatchEmul255_5" , 72, 1, 73,  38, -19, 19) ;
+   TPNoMatchEmul255_5->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul255_5->GetXaxis()->SetTitle("phi index") ;
+
+   vector <TH2I *> TPNoMatchEmul255; 
+   TPNoMatchEmul255.push_back(TPNoMatchEmul255_1);
+   TPNoMatchEmul255.push_back(TPNoMatchEmul255_2);
+   TPNoMatchEmul255.push_back(TPNoMatchEmul255_3);
+   TPNoMatchEmul255.push_back(TPNoMatchEmul255_4);
+   TPNoMatchEmul255.push_back(TPNoMatchEmul255_5);
+
+   TH2F * EmulvsTPnoMatching_1 = new TH2F("EmulvsTPnoMatching_1", "Emul vs TP if no match" ,256, 0, 256, 256, 0, 256); 
+   TH2F * EmulvsTPnoMatching_2 = new TH2F("EmulvsTPnoMatching_2", "Emul vs TP if no match" ,256, 0, 256, 256, 0, 256); 
+   TH2F * EmulvsTPnoMatching_3 = new TH2F("EmulvsTPnoMatching_3", "Emul vs TP if no match" ,256, 0, 256, 256, 0, 256); 
+   TH2F * EmulvsTPnoMatching_4 = new TH2F("EmulvsTPnoMatching_4", "Emul vs TP if no match" ,256, 0, 256, 256, 0, 256); 
+   TH2F * EmulvsTPnoMatching_5 = new TH2F("EmulvsTPnoMatching_5", "Emul vs TP if no match" ,256, 0, 256, 256, 0, 256); 
+   vector < TH2F *> EmulvsTPnoMatching; 
+   EmulvsTPnoMatching.push_back(EmulvsTPnoMatching_1); 
+   EmulvsTPnoMatching.push_back(EmulvsTPnoMatching_2); 
+   EmulvsTPnoMatching.push_back(EmulvsTPnoMatching_3); 
+   EmulvsTPnoMatching.push_back(EmulvsTPnoMatching_4); 
+   EmulvsTPnoMatching.push_back(EmulvsTPnoMatching_5); 
+
+   TH2F * EmulvsTPmatching_1 = new TH2F("EmulvsTPmatching_1", "Emul vs TP if match" ,256, 0, 256, 256, 0, 256); 
+   TH2F * EmulvsTPmatching_2 = new TH2F("EmulvsTPmatching_2", "Emul vs TP if match" ,256, 0, 256, 256, 0, 256); 
+   TH2F * EmulvsTPmatching_3 = new TH2F("EmulvsTPmatching_3", "Emul vs TP if match" ,256, 0, 256, 256, 0, 256); 
+   TH2F * EmulvsTPmatching_4 = new TH2F("EmulvsTPmatching_4", "Emul vs TP if match" ,256, 0, 256, 256, 0, 256); 
+   TH2F * EmulvsTPmatching_5 = new TH2F("EmulvsTPmatching_5", "Emul vs TP if match" ,256, 0, 256, 256, 0, 256); 
+   vector < TH2F *> EmulvsTPmatching; 
+   EmulvsTPmatching.push_back(EmulvsTPmatching_1); 
+   EmulvsTPmatching.push_back(EmulvsTPmatching_2); 
+   EmulvsTPmatching.push_back(EmulvsTPmatching_3); 
+   EmulvsTPmatching.push_back(EmulvsTPmatching_4); 
+   EmulvsTPmatching.push_back(EmulvsTPmatching_5); 
+
+   TH1F * TPEmulDiff_1= new TH1F ("TPEmulDiff_1", "TP - Emulator differerence 1", 512, -256, 256); 
+   TH1F * TPEmulDiff_2= new TH1F ("TPEmulDiff_2", "TP - Emulator differerence 2", 512, -256, 256); 
+   TH1F * TPEmulDiff_3= new TH1F ("TPEmulDiff_3", "TP - Emulator differerence 3", 512, -256, 256); 
+   TH1F * TPEmulDiff_4= new TH1F ("TPEmulDiff_4", "TP - Emulator differerence 4", 512, -256, 256); 
+   TH1F * TPEmulDiff_5= new TH1F ("TPEmulDiff_5", "TP - Emulator differerence 5", 512, -256, 256); 
+   vector <TH1F*> TPEmulDiff; 
+   TPEmulDiff.push_back(TPEmulDiff_1);
+   TPEmulDiff.push_back(TPEmulDiff_2);
+   TPEmulDiff.push_back(TPEmulDiff_3);
+   TPEmulDiff.push_back(TPEmulDiff_4);
+   TPEmulDiff.push_back(TPEmulDiff_5);
+     
+
+   TH2F * EmulvsTP_1 = new TH2F("EmulvsTP_1", "Emul vs TP" , 256, 0, 256, 256, 0, 256); 
+   TH2F * EmulvsTP_2 = new TH2F("EmulvsTP_2", "Emul vs TP" , 256, 0, 256, 256, 0, 256); 
+   TH2F * EmulvsTP_3 = new TH2F("EmulvsTP_3", "Emul vs TP" , 256, 0, 256, 256, 0, 256); 
+   TH2F * EmulvsTP_4 = new TH2F("EmulvsTP_4", "Emul vs TP" , 256, 0, 256, 256, 0, 256); 
+   TH2F * EmulvsTP_5 = new TH2F("EmulvsTP_5", "Emul vs TP" , 256, 0, 256, 256, 0, 256); 
+   vector < TH2F *> EmulvsTP; 
+   EmulvsTP.push_back(EmulvsTP_1); 
+   EmulvsTP.push_back(EmulvsTP_2); 
+   EmulvsTP.push_back(EmulvsTP_3); 
+   EmulvsTP.push_back(EmulvsTP_4); 
+   EmulvsTP.push_back(EmulvsTP_5); 
+
+   TH2F * TPMatchsFGVBEB = new TH2F("TPMatchsFGVBEB", "Emulator sFGVB: Barrel", 72, 1, 73, 38, -19, 19) ;
+   TPMatchsFGVBEB->GetYaxis()->SetTitle("eta index") ; 
+   TPMatchsFGVBEB->GetXaxis()->SetTitle("phi index") ;
+   TH2F * TPMatchttFlagEB2D = new TH2F("TPMatchttFlagEB2D", "Bad Emulator ttFlag: Barrel", 72, 1, 73, 38, -19, 19) ;
+   TPMatchttFlagEB2D->GetYaxis()->SetTitle("eta index") ; 
+   TPMatchttFlagEB2D->GetXaxis()->SetTitle("phi index") ;
+   TH2F * ttFlagEB2D = new TH2F("ttFlagEB2D", "Bad ttFlag: Barrel", 72, 1, 73, 38, -19, 19) ;
+   ttFlagEB2D->GetYaxis()->SetTitle("eta index") ; 
+   ttFlagEB2D->GetXaxis()->SetTitle("phi index") ;
    
+
    TH2F * TPCompEmulEB = new TH2F("TPCompEmulEB", "Number of TP-Emulator comparisons: Barrel", 72, 1, 73, 38, -19, 19) ;
    TPCompEmulEB->GetYaxis()->SetTitle("eta index") ; 
    TPCompEmulEB->GetXaxis()->SetTitle("phi index") ;
@@ -2262,11 +2443,23 @@ int main (int argc, char** argv)
          //std::cout<<"event kept, in tower loop"<<std::endl;
          int tp = getEt(treeVars.rawTPData[tower]) ;
 	 int raw_spike = treeVars.trig_tower_sFGVB[tower];
-         int emul[5] = {getEt(treeVars.rawTPEmul1[tower]),  
-         getEt(treeVars.rawTPEmul2[tower]),
-         getEt(treeVars.rawTPEmul3[tower]),
-         getEt(treeVars.rawTPEmul4[tower]),
-         getEt(treeVars.rawTPEmul5[tower])} ;
+         int emul[5] = {
+	   getEt(treeVars.rawTPEmul1[tower]),  
+	   getEt(treeVars.rawTPEmul2[tower]),
+	   getEt(treeVars.rawTPEmul3[tower]),
+	   getEt(treeVars.rawTPEmul4[tower]),
+	   getEt(treeVars.rawTPEmul5[tower])} ;
+	 int emulttFlag[5] = {treeVars.rawTPEmulttFlag1[tower], 
+			      treeVars.rawTPEmulttFlag2[tower], 
+			      treeVars.rawTPEmulttFlag3[tower], 
+			      treeVars.rawTPEmulttFlag4[tower], 
+			      treeVars.rawTPEmulttFlag5[tower]};
+	 int emulsFGVB[5] = {treeVars.rawTPEmulsFGVB1[tower], 
+			     treeVars.rawTPEmulsFGVB2[tower], 
+			     treeVars.rawTPEmulsFGVB3[tower], 
+			     treeVars.rawTPEmulsFGVB4[tower], 
+			     treeVars.rawTPEmulsFGVB5[tower]};
+	 
          //std::cout<<"event kept, TP&emul filled"<<std::endl;
          int maxOfTPEmul = 0 ;
          int indexOfTPEmulMax = -1 ;
@@ -2297,9 +2490,18 @@ int main (int argc, char** argv)
 	       etaphi_EB_sevlv3 -> Fill(iphi, ieta); 
 	     }else if (treeVars.sevlv[tower] == 4){
 	       etaphi_EB_sevlv4 -> Fill(iphi, ieta); 
-	   }else if (treeVars.sevlv[tower] == 5){
+	     }else if (treeVars.sevlv[tower] == 5){
 	       etaphi_EB_sevlv5 -> Fill(iphi, ieta); 
 	     }
+	     ttFlagEB->Fill(treeVars.ttFlag[tower]);
+	     if (treeVars.ttFlag[tower]!=0 && treeVars.ttFlag[tower]!=1&& treeVars.ttFlag[tower]!=3){
+	       ttFlagEB2D ->Fill(iphi, ieta); 
+	     }
+	     
+	     // if (entry < 1000 ) {
+	     //   printf("ieta %d  \t iphi: %d  \t tp: %d  \t ttFlag: %d  \t emul1: %d %d \t emul2: %d %d \t emul3: %d %d \t emul4: %d %d  emul5: %d %d \n ",  ieta , iphi,  tp ,  treeVars.ttFlag[tower] ,  getEt(treeVars.rawTPEmul1[tower]), treeVars.rawTPEmulsFGVB1[tower], getEt(treeVars.rawTPEmul2[tower]), treeVars.rawTPEmulsFGVB2[tower], getEt(treeVars.rawTPEmul3[tower]), treeVars.rawTPEmulsFGVB3[tower],   getEt(treeVars.rawTPEmul4[tower]), treeVars.rawTPEmulsFGVB4[tower], getEt(treeVars.rawTPEmul5[tower]), treeVars.rawTPEmulsFGVB5[tower]);
+	       
+	     // }
 	   }
 	 }else if (ieta>=18){
 	   if (tp > occupancyCut) {
@@ -2614,23 +2816,60 @@ int main (int argc, char** argv)
                if (tp == emul[i]) {
                   TPMatchEmulEB->Fill(i+1) ;
                   TPMatchEmul3D->Fill(iphi, ieta, i+1) ;
+		  if (emulsFGVB[i]==0) TPMatchsFGVBEB -> Fill(iphi, ieta);
+
 		  if (treeVars.sevlv[tower] == 1) TPMatchEmul3D_sevlv1->Fill(iphi, ieta, i+1) ;
 		  if (treeVars.sevlv[tower] == 2) TPMatchEmul3D_sevlv2->Fill(iphi, ieta, i+1) ;
 		  if (treeVars.sevlv[tower] == 3) TPMatchEmul3D_sevlv3->Fill(iphi, ieta, i+1) ;
 		  if (treeVars.sevlv[tower] == 4) TPMatchEmul3D_sevlv4->Fill(iphi, ieta, i+1) ;
 		  if (treeVars.sevlv[tower] == 5) TPMatchEmul3D_sevlv5->Fill(iphi, ieta, i+1) ;
                   match = true ;
+		  EmulvsTPmatching[i]->Fill(tp, emul[i]); 
                }
-            }
+	       TPMatchttFlagEB->Fill(emulttFlag[i]); 
+	       if(emulttFlag[i]!=0 && emulttFlag[i]!=1 &&   emulttFlag[i]!=3) TPMatchttFlagEB2D->Fill(iphi, ieta); 
+
+	       
+	       if (emul[i]!=0){
+		 EmulvsTP[i]->Fill(tp, emul[i]); 
+	       }
+	       
+	    }
+
             if (!match) {
+	      if (entry < 500000 ) {
+		printf("ieta %d  \t iphi: %d  \t tp: %d  \t ttFlag: %d  \t emul1: %d %d \t emul2: %d %d \t emul3: %d %d \t emul4: %d %d  emul5: %d %d \n ",  ieta , iphi,  tp ,  treeVars.ttFlag[tower] ,  getEt(treeVars.rawTPEmul1[tower]), treeVars.rawTPEmulsFGVB1[tower], getEt(treeVars.rawTPEmul2[tower]), treeVars.rawTPEmulsFGVB2[tower], getEt(treeVars.rawTPEmul3[tower]), treeVars.rawTPEmulsFGVB3[tower],   getEt(treeVars.rawTPEmul4[tower]), treeVars.rawTPEmulsFGVB4[tower], getEt(treeVars.rawTPEmul5[tower]), treeVars.rawTPEmulsFGVB5[tower]);
+		
+	      }
+
+	      for (int i=0 ; i<5 ; i++) {
+		 EmulvsTPnoMatching[i]->Fill(tp, emul[i]); 
+		 if (emul[i] == 0 )  {
+		   TPNoMatchEmul0[i]->Fill(iphi, ieta); 
+		   if (emulsFGVB[i]==0) TPNoMatchEmul0spikes[i]->Fill(iphi, ieta); 
+		   // if (entry < 10000)   cout << "Event " << treeVars.evtNb << ",  TP " << tp << ", Emul " << i << " "<< emul[i] << ", emul sFGVB " << emulsFGVB[i] << ", emul ttFlag " << emulttFlag[i] << ", ieta " << ieta << ", iphi " << iphi<< endl;
+		 }
+		 if (emul[i] > 200){
+		   TPNoMatchEmul255[i]->Fill(iphi, ieta); 
+		   //cout << "Event " << treeVars.evtNb << ",  TP " << tp << ", Emul " << i << " "<< emul[i] << ", emul sFGVB " << emulsFGVB[i] <<  ", emul ttFlag " << emulttFlag[i] << ", ieta " << ieta << ", iphi " << iphi << endl;
+		 }  
+		 if (emul[i]!=0){
+		   TPEmulDiff[i]->Fill(tp-emul[i]) ; 
+		   if (emul[i]!=255) {
+		     TPNoMatchSmallDiff[i]->Fill(iphi, ieta); 
+		     //cout << "Event " << treeVars.evtNb << ",  TP " << tp << ", Emul " << i << " "<< emul[i] << ", emul sFGVB " << emulsFGVB[i] <<  ", emul ttFlag " << emulttFlag[i] << ", ieta " << ieta << ", iphi " << iphi << endl;
+		   }
+		 }
+	       }
                TPMatchEmulEB->Fill(-1) ;
                TPMatchEmul3D->Fill(iphi, ieta, -1) ;
-		  if (treeVars.sevlv[tower] == 1) TPMatchEmul3D_sevlv1->Fill(iphi, ieta, -1) ;
-		  if (treeVars.sevlv[tower] == 2) TPMatchEmul3D_sevlv2->Fill(iphi, ieta, -1) ;
-		  if (treeVars.sevlv[tower] == 3) TPMatchEmul3D_sevlv3->Fill(iphi, ieta, -1) ;
-		  if (treeVars.sevlv[tower] == 4) TPMatchEmul3D_sevlv4->Fill(iphi, ieta, -1) ;
-		  if (treeVars.sevlv[tower] == 5) TPMatchEmul3D_sevlv5->Fill(iphi, ieta, -1) ;
-
+	       
+	       if (treeVars.sevlv[tower] == 1) TPMatchEmul3D_sevlv1->Fill(iphi, ieta, -1) ;
+	       if (treeVars.sevlv[tower] == 2) TPMatchEmul3D_sevlv2->Fill(iphi, ieta, -1) ;
+	       if (treeVars.sevlv[tower] == 3) TPMatchEmul3D_sevlv3->Fill(iphi, ieta, -1) ;
+	       if (treeVars.sevlv[tower] == 4) TPMatchEmul3D_sevlv4->Fill(iphi, ieta, -1) ;
+	       if (treeVars.sevlv[tower] == 5) TPMatchEmul3D_sevlv5->Fill(iphi, ieta, -1) ;
+	       
                if (verbose>5) {
                   std::cout<<"MISMATCH"<<std::endl ;
                   std::cout<<"(phi,eta, Nbxtals)="<<std::dec<<iphi<<" "<<ieta<<" "<<nbXtals<<std::endl ;
@@ -3280,6 +3519,7 @@ int main (int argc, char** argv)
             if(binz>1) {
                totalCell2 += content ;
             }
+	    //std::cout << __LINE__ << " " << binz <<  " maxBinz: " << maxBinz <<  " maxCell: " << maxCell << " totalCell: " << totalCell  << " totalCell2: " << totalCell2 << std::endl; 
          }
          if (maxCell <=0) maxBinz = 2 ; // empty cell
 
@@ -3314,8 +3554,10 @@ int main (int argc, char** argv)
             double fraction = 0 ;
             if (totalCell>0) fraction = 1.- maxCell/totalCell ;
             TPMatchFractionEB2D->SetBinContent(binx, biny-9, fraction) ;
-            
+          
             double fraction2 = 0 ;
+	    //std::cout << fraction2 << std::endl;
+	    //std::cout << __LINE__ << " " << maxBinz << " " << maxCell<< " " << totalCell2 << std::endl;
             if (maxBinz != 1 && totalCell2>0) fraction2 = 1.- maxCell/totalCell2 ;
             TPMatchFraction2EB2D->SetBinContent(binx, biny-9, fraction2 ) ;         
          }
@@ -3463,6 +3705,12 @@ int main (int argc, char** argv)
    occupancyTPEmulEEMinusALL->Write() ;
    
    FiredTriggers->Write() ;
+
+   TPMatchsFGVBEB->Write();
+   TPMatchttFlagEB->Write();
+   TPMatchttFlagEB2D->Write();
+   ttFlagEB->Write();
+   ttFlagEB2D->Write();
    
    TPEB->Write() ;
    TPEEPlus->Write() ;
@@ -3559,7 +3807,7 @@ int main (int argc, char** argv)
    
    TPMatchFractionEB2D->Write() ;
    TPMatchFractionEEPlus2D->Write() ; 
-   TPMatchFractionEEMinus2D->Write() ; 
+   TPMatchFractionEEMinus2D->Write() ;
 
    TPMatchFractionEB2D_sevlv1->Write() ;
    TPMatchFractionEEPlus2D_sevlv1->Write() ; 
@@ -3577,6 +3825,17 @@ int main (int argc, char** argv)
    TPMatchFractionEEPlus2D_sevlv5->Write() ; 
    TPMatchFractionEEMinus2D_sevlv5->Write() ; 
    
+   for (int i = 0; i < 5; i++ ) {
+     EmulvsTPmatching[i]->Write();
+     EmulvsTPnoMatching[i]->Write();
+     EmulvsTP[i]->Write();
+     TPEmulDiff[i]->Write(); 
+     TPNoMatchEmul0[i]->Write(); 
+     TPNoMatchEmul0spikes[i]->Write(); 
+     TPNoMatchEmul255[i]->Write(); 
+     TPNoMatchSmallDiff[i]->Write(); 
+     
+   }
    TPMatchFraction2EB2D->Write() ;
    TPMatchFraction2EEPlus2D->Write() ; 
    TPMatchFraction2EEMinus2D->Write() ; 

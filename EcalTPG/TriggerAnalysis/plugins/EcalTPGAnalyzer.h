@@ -28,14 +28,20 @@ class towerEner {
  public:
   float eRec_ ;
   int tpgEmul_[5] ;
+  int tpgEmulFlag_[5] ;
+  int tpgEmulsFGVB_[5] ;
   int tpgADC_; 
   int iphi_, ieta_, nbXtal_, spike_ ;
-  int twrADC, sFGVB, sevlv_;
+  int twrADC, sFGVB, sevlv_, ttFlag_;
   towerEner()
     : eRec_(0), tpgADC_(0),  
-    iphi_(-999), ieta_(-999), nbXtal_(0), spike_(0), twrADC(0), sFGVB(-999), sevlv_(0) 
+    iphi_(-999), ieta_(-999), nbXtal_(0), spike_(0), twrADC(0), sFGVB(-999), sevlv_(0) , ttFlag_(0)
   { 
-    for (int i=0 ; i<5 ; i ++) tpgEmul_[i] = 0 ; 
+    for (int i=0 ; i<5 ; i ++) {
+      tpgEmul_[i] = 0 ; 
+      tpgEmulFlag_[i]=0;
+      tpgEmulsFGVB_[i]=0;
+    }
   }
 };
 
@@ -77,9 +83,20 @@ private:
     int rawTPEmul3[4032] ;
     int rawTPEmul4[4032] ;
     int rawTPEmul5[4032] ;
+    int rawTPEmulttFlag1[4032] ;
+    int rawTPEmulttFlag2[4032] ;
+    int rawTPEmulttFlag3[4032] ;
+    int rawTPEmulttFlag4[4032] ;
+    int rawTPEmulttFlag5[4032] ;
+    int rawTPEmulsFGVB1[4032] ;
+    int rawTPEmulsFGVB2[4032] ;
+    int rawTPEmulsFGVB3[4032] ;
+    int rawTPEmulsFGVB4[4032] ;
+    int rawTPEmulsFGVB5[4032] ;
     float eRec[4032] ;
     int sevlv[4032];
     int spike[4032] ;
+    int ttFlag[4032];
 
     uint nbOfL1IsoCands ; //
     int L1IsoIeta[10] ;
