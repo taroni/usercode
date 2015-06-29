@@ -101,6 +101,7 @@ struct EcalTPGVariables
   int rawTPEmulsFGVB5[4032] ;
   
   float eRec[4032] ;
+  int crystNb[4032] ;
   int spike[4032] ;
   int sevlv[4032];
   int ttFlag[4032];
@@ -169,6 +170,7 @@ void setBranchAddresses (TChain * chain, EcalTPGVariables & treeVars)
    chain->SetBranchAddress ("rawTPEmul4",treeVars.rawTPEmul4) ; 
    chain->SetBranchAddress ("rawTPEmul5",treeVars.rawTPEmul5) ; 
    chain->SetBranchAddress ("eRec",treeVars.eRec) ; 
+   chain->SetBranchAddress ("crystNb",treeVars.crystNb) ;
    chain->SetBranchAddress ("spike",treeVars.spike) ;
    chain->SetBranchAddress ("sevlv", treeVars.sevlv);
    chain->SetBranchAddress ("ttFlag", treeVars.ttFlag);
@@ -1156,6 +1158,10 @@ int main (int argc, char** argv)
    TPNoMatchSmallDiff.push_back(TPNoMatchSmallDiff_4);
    TPNoMatchSmallDiff.push_back(TPNoMatchSmallDiff_5);
 
+   TH2I * TPNoMatchEmul = new TH2I("TPNoMatchEmul", "TPNoMatchEmul" , 72, 1, 73, 38, -19, 19) ;
+   TPNoMatchEmul->GetYaxis()->SetTitle("eta index") ;
+   TPNoMatchEmul->GetXaxis()->SetTitle("phi index") ;
+
    TH2I * TPNoMatchEmul0_1 = new TH2I("TPNoMatchEmul0_1", "TPNoMatchEmul0_1" , 72, 1, 73, 38, -19, 19) ;
    TPNoMatchEmul0_1->GetYaxis()->SetTitle("eta index") ;
    TPNoMatchEmul0_1->GetXaxis()->SetTitle("phi index") ;
@@ -1224,6 +1230,8 @@ int main (int argc, char** argv)
    TPNoMatchEmul255.push_back(TPNoMatchEmul255_3);
    TPNoMatchEmul255.push_back(TPNoMatchEmul255_4);
    TPNoMatchEmul255.push_back(TPNoMatchEmul255_5);
+
+   TH1I * crystalNbNoMatching = new TH1I("crystalNbNoMatching", "Number of readout crystals if no matching", 26, 0, 26);
 
    TH2F * EmulvsTPnoMatching_1 = new TH2F("EmulvsTPnoMatching_1", "Emul vs TP if no match" ,256, 0, 256, 256, 0, 256); 
    TH2F * EmulvsTPnoMatching_2 = new TH2F("EmulvsTPnoMatching_2", "Emul vs TP if no match" ,256, 0, 256, 256, 0, 256); 
@@ -2497,11 +2505,8 @@ int main (int argc, char** argv)
 	     if (treeVars.ttFlag[tower]!=0 && treeVars.ttFlag[tower]!=1&& treeVars.ttFlag[tower]!=3){
 	       ttFlagEB2D ->Fill(iphi, ieta); 
 	     }
-	     
-	     // if (entry < 1000 ) {
-	     //   printf("ieta %d  \t iphi: %d  \t tp: %d  \t ttFlag: %d  \t emul1: %d %d \t emul2: %d %d \t emul3: %d %d \t emul4: %d %d  emul5: %d %d \n ",  ieta , iphi,  tp ,  treeVars.ttFlag[tower] ,  getEt(treeVars.rawTPEmul1[tower]), treeVars.rawTPEmulsFGVB1[tower], getEt(treeVars.rawTPEmul2[tower]), treeVars.rawTPEmulsFGVB2[tower], getEt(treeVars.rawTPEmul3[tower]), treeVars.rawTPEmulsFGVB3[tower],   getEt(treeVars.rawTPEmul4[tower]), treeVars.rawTPEmulsFGVB4[tower], getEt(treeVars.rawTPEmul5[tower]), treeVars.rawTPEmulsFGVB5[tower]);
-	       
-	     // }
+	     //if (entry <1000 )
+	       // printf("ieta %d  \t iphi: %d  \t tp: %d  \t ttFlag: %d  \t emul1: %d %d \t emul2: %d %d \t emul3: %d %d \t emul4: %d %d  emul5: %d %d readout crystal Nb %d \n ",  ieta , iphi,  tp ,  treeVars.ttFlag[tower] ,  getEt(treeVars.rawTPEmul1[tower]), treeVars.rawTPEmulsFGVB1[tower], getEt(treeVars.rawTPEmul2[tower]), treeVars.rawTPEmulsFGVB2[tower], getEt(treeVars.rawTPEmul3[tower]), treeVars.rawTPEmulsFGVB3[tower],   getEt(treeVars.rawTPEmul4[tower]), treeVars.rawTPEmulsFGVB4[tower], getEt(treeVars.rawTPEmul5[tower]), treeVars.rawTPEmulsFGVB5[tower], treeVars.crystNb[tower]);
 	   }
 	 }else if (ieta>=18){
 	   if (tp > occupancyCut) {
@@ -2837,13 +2842,14 @@ int main (int argc, char** argv)
 	    }
 
             if (!match) {
-	      if (entry < 500000 ) {
-		printf("ieta %d  \t iphi: %d  \t tp: %d  \t ttFlag: %d  \t emul1: %d %d \t emul2: %d %d \t emul3: %d %d \t emul4: %d %d  emul5: %d %d \n ",  ieta , iphi,  tp ,  treeVars.ttFlag[tower] ,  getEt(treeVars.rawTPEmul1[tower]), treeVars.rawTPEmulsFGVB1[tower], getEt(treeVars.rawTPEmul2[tower]), treeVars.rawTPEmulsFGVB2[tower], getEt(treeVars.rawTPEmul3[tower]), treeVars.rawTPEmulsFGVB3[tower],   getEt(treeVars.rawTPEmul4[tower]), treeVars.rawTPEmulsFGVB4[tower], getEt(treeVars.rawTPEmul5[tower]), treeVars.rawTPEmulsFGVB5[tower]);
+	      // if (entry < 100000 ) {
+	      // 	printf("ieta %d  \t iphi: %d  \t tp: %d  \t ttFlag: %d  \t emul1: %d %d \t emul2: %d %d \t emul3: %d %d \t emul4: %d %d  emul5: %d %d readout crystal Nb %d \n ",  ieta , iphi,  tp ,  treeVars.ttFlag[tower] ,  getEt(treeVars.rawTPEmul1[tower]), treeVars.rawTPEmulsFGVB1[tower], getEt(treeVars.rawTPEmul2[tower]), treeVars.rawTPEmulsFGVB2[tower], getEt(treeVars.rawTPEmul3[tower]), treeVars.rawTPEmulsFGVB3[tower],   getEt(treeVars.rawTPEmul4[tower]), treeVars.rawTPEmulsFGVB4[tower], getEt(treeVars.rawTPEmul5[tower]), treeVars.rawTPEmulsFGVB5[tower], treeVars.crystNb[tower]);
 		
-	      }
-
+	      // }
+	      crystalNbNoMatching->Fill(treeVars.crystNb[tower]);
 	      for (int i=0 ; i<5 ; i++) {
 		 EmulvsTPnoMatching[i]->Fill(tp, emul[i]); 
+		 
 		 if (emul[i] == 0 )  {
 		   TPNoMatchEmul0[i]->Fill(iphi, ieta); 
 		   if (emulsFGVB[i]==0) TPNoMatchEmul0spikes[i]->Fill(iphi, ieta); 
@@ -2863,7 +2869,8 @@ int main (int argc, char** argv)
 	       }
                TPMatchEmulEB->Fill(-1) ;
                TPMatchEmul3D->Fill(iphi, ieta, -1) ;
-	       
+	       TPNoMatchEmul->Fill(iphi,ieta);
+
 	       if (treeVars.sevlv[tower] == 1) TPMatchEmul3D_sevlv1->Fill(iphi, ieta, -1) ;
 	       if (treeVars.sevlv[tower] == 2) TPMatchEmul3D_sevlv2->Fill(iphi, ieta, -1) ;
 	       if (treeVars.sevlv[tower] == 3) TPMatchEmul3D_sevlv3->Fill(iphi, ieta, -1) ;
@@ -3793,6 +3800,7 @@ int main (int argc, char** argv)
    TPMatchEmulEEPlus->Write() ; 
    TPMatchEmulEEMinus->Write() ; 
    TPMatchEmul3D->Write() ; 
+   TPNoMatchEmul->Write(); 
    TPEmulMaxIndexEB->Write() ;
    TPEmulMaxIndexEEPlus->Write() ;
    TPEmulMaxIndexEEMinus->Write() ;
@@ -3825,6 +3833,7 @@ int main (int argc, char** argv)
    TPMatchFractionEEPlus2D_sevlv5->Write() ; 
    TPMatchFractionEEMinus2D_sevlv5->Write() ; 
    
+   crystalNbNoMatching->Write(); 
    for (int i = 0; i < 5; i++ ) {
      EmulvsTPmatching[i]->Write();
      EmulvsTPnoMatching[i]->Write();

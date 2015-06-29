@@ -27,6 +27,7 @@ class EcalElectronicsMapping ;
 class towerEner {   
  public:
   float eRec_ ;
+  int crystNb_ ;
   int tpgEmul_[5] ;
   int tpgEmulFlag_[5] ;
   int tpgEmulsFGVB_[5] ;
@@ -34,7 +35,7 @@ class towerEner {
   int iphi_, ieta_, nbXtal_, spike_ ;
   int twrADC, sFGVB, sevlv_, ttFlag_;
   towerEner()
-    : eRec_(0), tpgADC_(0),  
+    : eRec_(0),  crystNb_(0), tpgADC_(0),  
     iphi_(-999), ieta_(-999), nbXtal_(0), spike_(0), twrADC(0), sFGVB(-999), sevlv_(0) , ttFlag_(0)
   { 
     for (int i=0 ; i<5 ; i ++) {
@@ -94,6 +95,7 @@ private:
     int rawTPEmulsFGVB4[4032] ;
     int rawTPEmulsFGVB5[4032] ;
     float eRec[4032] ;
+    int crystNb[4032];
     int sevlv[4032];
     int spike[4032] ;
     int ttFlag[4032];

@@ -126,6 +126,7 @@ EcalTPGAnalyzer::EcalTPGAnalyzer(const edm::ParameterSet&  iConfig)
     tree_->Branch("rawTPEmul3", treeVariables_.rawTPEmul3,"rawTPEmul3[nbOfTowers]/I");//
     tree_->Branch("rawTPEmul4", treeVariables_.rawTPEmul4,"rawTPEmul4[nbOfTowers]/I");//
     tree_->Branch("rawTPEmul5", treeVariables_.rawTPEmul5,"rawTPEmul5[nbOfTowers]/I");//
+    tree_->Branch("crystNb", treeVariables_.crystNb,"crystNb[nbOfTowers]/I");//
     tree_->Branch("eRec", treeVariables_.eRec,"eRec[nbOfTowers]/F");//
     tree_->Branch("ttFlag", treeVariables_.ttFlag,"ttFlag[nbOfTowers]/I");//
     tree_->Branch("sevlv", treeVariables_.sevlv,"sevlv[nbOfTowers]/I");//
@@ -844,19 +845,24 @@ void EcalTPGAnalyzer::analyze(const edm::Event& iEvent, const  edm::EventSetup &
     //std::cout << " rechitsEB size " << rechitsEB.product()->size() << std::endl;
     float maxRecHitEnergy = 0. ;
     if (rechitsEB.product()->size()!=0) {
-        for ( EcalRecHitCollection::const_iterator rechitItr = rechitsEB->begin(); rechitItr != rechitsEB->end(); ++rechitItr ) {   
+      for ( EcalRecHitCollection::const_iterator rechitItr = rechitsEB->begin(); rechitItr != rechitsEB->end(); ++rechitItr ) {   
             EBDetId id = rechitItr->id(); 
             const EcalTrigTowerDetId towid = id.tower();
             itTT = mapTower.find(towid) ;
-	    
+
             if (itTT != mapTower.end()) {
-                double theta = theBarrelGeometry_->getGeometry(id)->getPosition().theta() ;
+	     
+	      double theta = theBarrelGeometry_->getGeometry(id)->getPosition().theta() ;
                 (itTT->second).eRec_ += rechitItr->energy()*sin(theta) ;
-		if (maxRecHitEnergy < rechitItr->energy()*sin(theta) && rechitItr->energy()*sin(theta) > 1. )
+		if (maxRecHitEnergy < rechitItr->energy()*sin(theta) && rechitItr->energy()*sin(theta) > 1. ){
 		  (itTT->second).sevlv_ = sevlv->severityLevel(id, *rechitsEB); 
+
+		}
 		//(itTT->second).sevlv = sevlv->severityLevel(*rh); 
 		//cout << "severity level barrel " << sevlv->severityLevel(id, *rechitsEB) << endl; 
+		(itTT->second).crystNb_++;
             }
+
           //  uint32_t sev = sevlv->severityLevel( id, *rechitsEB);
             //sevlv->severityLevel( id, *rechitsEB);
 	    
@@ -874,6 +880,7 @@ void EcalTPGAnalyzer::analyze(const edm::Event& iEvent, const  edm::EventSetup &
     // Get EE rechits
     edm::Handle<EcalRecHitCollection> rechitsEE; 
     if (iEvent.getByLabel(EcalRecHitCollectionEE_, rechitsEE) ) {
+      
         for ( EcalRecHitCollection::const_iterator rechitItr = rechitsEE->begin(); rechitItr != rechitsEE->end(); ++rechitItr ) {   
             EEDetId id = rechitItr->id();
             const EcalTrigTowerDetId towid = (*eTTmap_).towerOf(id);
@@ -929,6 +936,7 @@ void EcalTPGAnalyzer::analyze(const edm::Event& iEvent, const  edm::EventSetup &
             treeVariables_.rawTPEmulsFGVB3[towerNb] = (itTT->second).tpgEmulsFGVB_[2] ;
             treeVariables_.rawTPEmulsFGVB4[towerNb] = (itTT->second).tpgEmulsFGVB_[3] ;
             treeVariables_.rawTPEmulsFGVB5[towerNb] = (itTT->second).tpgEmulsFGVB_[4] ;
+            treeVariables_.crystNb[towerNb] = (itTT->second).crystNb_ ;
             treeVariables_.eRec[towerNb] = (itTT->second).eRec_ ;
             treeVariables_.sevlv[towerNb] = (itTT->second).sevlv_ ;
             treeVariables_.ttFlag[towerNb] = (itTT->second).ttFlag_ ;
