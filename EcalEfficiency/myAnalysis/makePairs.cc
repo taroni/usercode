@@ -13,7 +13,7 @@
 #include <TMath.h>
 #include <TStyle.h>
 #include <TSystem.h>
-#include "../../Macros/Common/baseFuncNad.h"
+#include "baseFuncNad.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 //#include <boost/filesystem.hpp>
