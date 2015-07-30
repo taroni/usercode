@@ -1,0 +1,92 @@
+This is a c++ version of the Nadir macros to analyse the trigger efficiency. 
+It is very rought and with a lot of room for improvement but it works.
+
+Once the ECALTrees have been produces, the efficiency analysis is based on three steps:
+1- makePairs
+2- selectPairs
+3- fitEfficiency
+
+++++++
+HOW TO
+++++++
+
+The Makefile contains all the rules for compiling and running. 
+The analyzers need some ROOT and ROOFIT libs.  To link them properly go to a CMSSW area (CMSSW_5_3_X or newer) and set up the enviroment with 
+
+> cmsenv
+
+The analyzers can be now run where you want, the libraries will be linked properly.
+
+========================================================================
+
+JOBID 
+------
+the first line of the Makefile contains the JOBID. It is the name of the dir that will contain all the output files.
+
+========================================================================
+
+FIRST STEP: makePairs
+---------------------
+1- Open makePairs.cc and change the EcalTree path in the function  makePairs
+   if you want to use files saved on eos you should have a proxy active in your working area (check it with voms-proxy-info) 
+
+2 - compile:
+>  make makePairs
+
+3 - run it!
+>  make runPairs
+
+the output files are saved in JOBID/makePairsDir
+
+=========================================================================
+
+SECOND STEP: selectPairs
+------------------------
+1 - compile:
+>  make selectPairs
+
+2 - run it!
+>  make runSelect
+
+the output files are saved in JOBID/selectPairsDir
+
+=========================================================================
+
+THIRD STEP: fit the efficiency
+------------------------------
+1- compile 
+>   make fitEfficiency 
+
+2- run it!
+>   make runFit
+
+the output files and the plots are saved in JOBID/selectPairsDir. 
+The root file contains a tree with the max efficiency value, the 95% efficiency value and the E_t at which the 95% efficency is reached for the 2 configuration. 
+
+==========================================================================
+
+ALL IN ONE
+----------
+
+you can compile all the program in one shot:
+> make all
+and run them 
+> make runAll
+
+==========================================================================
+
+CLEAN
+-----
+
+To clean you are:
+
+> clean all
+
+To remove only an executable:
+
+> make cleanPairs
+
+> make cleanSelect
+
+> make cleanFit
+
