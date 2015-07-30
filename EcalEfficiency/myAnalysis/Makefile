@@ -13,7 +13,7 @@ SELECT        = selectPairs
 MAKEPAIRS     = makePairs
 
 
-all: $(FIT) $(FILE_EXISTS)
+all: $(FIT) 
 
 $(FIT):   $(SRCS) $(SELECT) 
 	echo "Linking $(FIT) ..."
