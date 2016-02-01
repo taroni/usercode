@@ -734,7 +734,7 @@ for( int iEle=0 ; iEle<2 ; iEle++ ) {
     
 	// FILL TRIGGER TREE FOR EFFICIENCY ///////////////////////
 	int idxECAL=-1;
-	if( pair_eta[iProbe]<1.479 ) idxECAL=0;
+	if( abs(pair_eta[iProbe])<1.479 ) idxECAL=0;
 	else idxECAL = 1;
 	
 	for(int iColl=0 ; iColl<nColl ; iColl++) {
