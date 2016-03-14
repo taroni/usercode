@@ -1,0 +1,184 @@
+// -*- C++ -*-
+//
+// Package:    LFVAnalysis/GenSyst
+// Class:      GenSyst
+// 
+/**\class GenSyst GenSyst.cc LFVAnalysis/GenSyst/plugins/GenSyst.cc
+
+ Description: [one line class summary]
+
+ Implementation:
+     [Notes on implementation]
+*/
+//
+// Original Author:  Silvia Taroni
+//         Created:  Sun, 28 Feb 2016 14:58:30 GMT
+//
+//
+
+#define DEBUG 1
+// system include files
+#include <memory>
+#include <iostream>
+#include <fstream>
+
+// user include files
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/one/EDAnalyzer.h"
+
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Framework/interface/ESHandle.h"
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/Utilities/interface/InputTag.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
+//
+// class declaration
+//
+
+// If the analyzer does not use TFileService, please remove
+// the template argument to the base class so the class inherits
+// from  edm::one::EDAnalyzer<> and also remove the line from
+// constructor "usesResource("TFileService");"
+// This will improve performance in multithreaded jobs.
+
+class GenSyst : public edm::one::EDAnalyzer<edm::one::SharedResources>  {
+   public:
+      explicit GenSyst(const edm::ParameterSet&);
+      ~GenSyst();
+
+      static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
+
+
+   private:
+      virtual void beginJob() override;
+      virtual void analyze(const edm::Event&, const edm::EventSetup&) override;
+      virtual void endJob() override;
+      virtual void beginRun( edm::Run const&,  edm::EventSetup const&) override;
+      virtual void endRun( edm::Run const&, edm::EventSetup const &) override;
+
+      edm::EDGetTokenT<GenEventInfoProduct>    tok_gen_;
+  //edm::EDGetTokenT<LHERunInfoProduct,edm::InRun> lheRunInfoToken_;
+      edm::EDGetTokenT<LHEEventProduct> tok_lhe_ ;
+      int nevent_run;  
+
+      // ----------member data ---------------------------
+};
+
+//
+// constants, enums and typedefs
+//
+
+//
+// static data member definitions
+//
+
+//
+// constructors and destructor
+//
+GenSyst::GenSyst(const edm::ParameterSet& iConfig)
+
+{
+   //now do what ever initialization is needed
+   usesResource("TFileService");
+   tok_gen_       = consumes<GenEventInfoProduct>(edm::InputTag("generator"));
+   tok_lhe_       = consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer")) ;
+   //produces<LHERunInfoProduct, edm::InRun>();
+   //lheRunInfoToken_ = consumes<LHERunInfoProduct,edm::InRun>(edm::InputTag("externalLHEProducer"));
+}
+
+
+GenSyst::~GenSyst()
+{
+ 
+   // do anything here that needs to be done at desctruction time
+   // (e.g. close files, deallocate resources etc.)
+
+}
+
+
+//
+// member functions
+//
+
+// ------------ method called for each event  ------------
+void
+GenSyst::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+  nevent_run++;
+   using namespace edm;
+   //using namespace reco;
+   using namespace std;
+   
+  if (DEBUG) std::cout << __LINE__ << std::endl;
+   edm::Handle<GenEventInfoProduct> genEventInfo;
+   iEvent.getByToken(tok_gen_, genEventInfo);
+
+
+   std::vector<double>& evtWeights = (std::vector<double>&) genEventInfo->weights();
+   double theWeight = genEventInfo->weight();
+
+   edm::Handle<LHEEventProduct> EvtHandle ;
+   iEvent.getByToken( tok_lhe_ , EvtHandle ) ;
+
+  if (DEBUG) std::cout << __LINE__ << std::endl;
+
+
+
+}
+
+
+// ------------ method called once each job just before starting event loop  ------------
+void 
+GenSyst::beginJob()
+{
+}
+
+// ------------ method called once each job just after ending the event loop  ------------
+void 
+GenSyst::endJob() 
+{
+}
+
+// ------------ method fills 'descriptions' with the allowed parameters for the module  ------------
+void
+GenSyst::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
+  //The following says we do not know what parameters are allowed so do no validation
+  // Please change this to state exactly what you do use, even if it is no parameters
+  edm::ParameterSetDescription desc;
+  desc.setUnknown();
+  descriptions.addDefault(desc);
+}
+
+void GenSyst::beginRun( edm::Run const & iRun,  edm::EventSetup const& iSetup) {
+  nevent_run = 0;
+  if (DEBUG) std::cout << __LINE__ << std::endl;
+     edm::Handle<LHERunInfoProduct> run; 
+     typedef std::vector<LHERunInfoProduct::Header>::const_iterator headers_const_iterator;
+     
+     iRun.getByLabel("externalLHEProducer", run );
+     LHERunInfoProduct myLHERunInfoProduct = *(run.product());
+     
+     for (headers_const_iterator iter=myLHERunInfoProduct.headers_begin(); iter!=myLHERunInfoProduct.headers_end(); iter++){
+       std::cout << iter->tag() << std::endl;
+       std::vector<std::string> lines = iter->lines();
+       for (unsigned int iLine = 0; iLine<lines.size(); iLine++) {
+	 std::cout << lines.at(iLine);
+       }
+     }
+}
+void GenSyst::endRun( const edm::Run& iRun, const edm::EventSetup& iSetup) {
+  std::cout <<" Runnumber "<<iRun.run()<<" Nevents  "<<nevent_run;
+}
+ 
+
+//define this as a plug-in
+DEFINE_FWK_MODULE(GenSyst);

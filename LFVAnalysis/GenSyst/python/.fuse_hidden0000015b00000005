@@ -1,0 +1,273 @@
+import ROOT
+
+
+hfile = ROOT.TFile("TheoUnc_HiggsToMuTau_125.root", "READ")
+hdir = hfile.Get("demo") 
+hlist = hdir.GetListOfKeys()
+
+had_pdf=[]
+lep_pdf=[]
+had_scale=[]
+lep_scale=[]
+h_had_pdf_2k =[]
+h_had_pdf_3k =[]
+h_had_pdf_4k =[]
+h_hadscale =[]
+h_lep_pdf_2k =[]
+h_lep_pdf_3k =[]
+h_lep_pdf_4k =[]
+h_lepscale =[]
+for hname in hlist:
+    if 'had' in hname.GetName():
+        if 'pdf' in hname.GetName():
+            if 'pdf_40' in hname.GetName():
+                h_had_pdf_4k.append(hname.GetName())
+            if 'pdf_30' in hname.GetName():
+                h_had_pdf_3k.append(hname.GetName())
+            if 'pdf_2' in hname.GetName():
+                h_had_pdf_2k.append(hname.GetName())
+        if 'scale' in hname.GetName():
+            h_hadscale.append(hname.GetName())
+    if 'lep' in hname.GetName():
+        if 'pdf_40' in hname.GetName():
+            h_lep_pdf_4k.append(hname.GetName())
+        if 'pdf_30' in hname.GetName():
+            h_lep_pdf_3k.append(hname.GetName())
+        if 'pdf_2' in hname.GetName():
+            h_lep_pdf_2k.append(hname.GetName())
+        if 'scale' in hname.GetName():
+            h_lepscale.append(hname.GetName())
+        
+ref_had_scale =0.
+ref_lep_scale =0.
+##had scale syst
+int_had_scale=[]
+for name in h_hadscale:
+
+    if '1001' in name : 
+        ref_had_scale = hdir.Get(name).Integral()
+    else:
+        int_had_scale.append(hdir.Get(name).Integral())
+
+for n,value in enumerate(int_had_scale):
+    int_had_scale[n]=abs((value-ref_had_scale)/ref_had_scale)
+print 'had scale: %.2f, %.2f' %(min(int_had_scale), max(int_had_scale))
+
+##lep scale syst
+int_lep_scale=[]
+for name in h_lepscale:
+    if '1001' in name : 
+        ref_lep_scale = hdir.Get(name).Integral()
+    else:
+        int_lep_scale.append(hdir.Get(name).Integral())
+for n,value in enumerate(int_lep_scale):
+    int_lep_scale[n]=abs((value-ref_lep_scale)/ref_lep_scale)
+print 'lep scale: %.2f, %.2f'%(min(int_lep_scale), max(int_lep_scale))
+
+ref_had_pdf_4k=0.
+ref_lep_pdf_4k =0.
+ref_had_pdf_3k=0.
+ref_lep_pdf_3k =0.
+ref_had_pdf_2k=0.
+ref_lep_pdf_2k =0.
+
+int_lep_pdf_4k=[]
+int_lep_pdf_3k=[]
+int_lep_pdf_2k=[]
+
+int_had_pdf_4k=[]
+int_had_pdf_3k=[]
+int_had_pdf_2k=[]
+
+
+for name in h_had_pdf_4k:
+    if '4001' in name : 
+        ref_had_pdf_4k = hdir.Get(name).Integral()
+    else:
+        int_had_pdf_4k.append(hdir.Get(name).Integral())
+for n,value in enumerate(int_had_pdf_4k):
+    int_had_pdf_4k[n]=abs((value-ref_had_pdf_4k)/ref_had_pdf_4k)
+
+print 'had pdf 4k: %.2f, %.2f'%( min(int_had_pdf_4k), max(int_had_pdf_4k))
+
+for name in h_had_pdf_3k:
+    if '3001' in name : 
+        ref_had_pdf_3k = hdir.Get(name).Integral()
+    else:
+        int_had_pdf_3k.append(hdir.Get(name).Integral())
+for n,value in enumerate(int_had_pdf_3k):
+    int_had_pdf_3k[n]=abs((value-ref_had_pdf_3k)/ref_had_pdf_3k)
+print 'had pdf 3k: %.2f, %.2f' %(min(int_had_pdf_3k), max(int_had_pdf_3k))
+
+for name in h_had_pdf_2k:
+    if '2001' in name : 
+        ref_had_pdf_2k = hdir.Get(name).Integral()
+    else:
+        int_had_pdf_2k.append(hdir.Get(name).Integral())
+for n,value in enumerate(int_had_pdf_2k):
+    int_had_pdf_2k[n]=abs((value-ref_had_pdf_2k)/ref_had_pdf_2k)
+print 'had pdf 2k: %.2f, %.2f' %(min(int_had_pdf_2k), max(int_had_pdf_2k))
+
+for name in h_lep_pdf_4k:
+    if '4001' in name : 
+        ref_lep_pdf_4k = hdir.Get(name).Integral()
+    else:
+        int_lep_pdf_4k.append(hdir.Get(name).Integral())
+for n,value in enumerate(int_lep_pdf_4k):
+    int_lep_pdf_4k[n]=abs((value-ref_lep_pdf_4k)/ref_lep_pdf_4k)
+print 'lep pdf 4k: %.2f, %.2f' %(min(int_lep_pdf_4k), max(int_lep_pdf_4k))
+
+for name in h_lep_pdf_3k:
+    if '3001' in name : 
+        ref_lep_pdf_3k = hdir.Get(name).Integral()
+    else:
+        int_lep_pdf_3k.append(hdir.Get(name).Integral())
+for n,value in enumerate(int_lep_pdf_3k):
+    int_lep_pdf_3k[n]=abs((value-ref_lep_pdf_3k)/ref_lep_pdf_3k)
+print 'lep pdf 3k: %.2f, %.2f' %(min(int_lep_pdf_3k), max(int_lep_pdf_3k))
+
+for name in h_lep_pdf_2k:
+    if '2001' in name : 
+        ref_lep_pdf_2k = hdir.Get(name).Integral()
+    else:
+        int_lep_pdf_2k.append(hdir.Get(name).Integral())
+for n,value in enumerate(int_lep_pdf_2k):
+    int_lep_pdf_2k[n]=abs((value-ref_lep_pdf_2k)/ref_lep_pdf_2k)
+
+print 'lep pdf 2k: %.2f, %.2f' %(min(int_lep_pdf_2k), max(int_lep_pdf_2k))
+
+
+
+for j in range(0, 3):
+    had_pdf=[]
+    lep_pdf=[]
+    had_scale=[]
+    lep_scale=[]
+    h_had_pdf_2k =[]
+    h_had_pdf_3k =[]
+    h_had_pdf_4k =[]
+    h_hadscale =[]
+    h_lep_pdf_2k =[]
+    h_lep_pdf_3k =[]
+    h_lep_pdf_4k =[]
+    h_lepscale =[]
+    for hname in hlist:
+        if str(j)+'j' not in hname.GetName(): continue
+        if 'had' in hname.GetName():
+            if 'pdf' in hname.GetName():
+                if 'pdf_40' in hname.GetName():
+                    h_had_pdf_4k.append(hname.GetName())
+                if 'pdf_30' in hname.GetName():
+                    h_had_pdf_3k.append(hname.GetName())
+                if 'pdf_2' in hname.GetName():
+                    h_had_pdf_2k.append(hname.GetName())
+            if 'scale' in hname.GetName():
+                h_hadscale.append(hname.GetName())
+        if 'lep' in hname.GetName():
+            if 'pdf_40' in hname.GetName():
+                h_lep_pdf_4k.append(hname.GetName())
+            if 'pdf_30' in hname.GetName():
+                h_lep_pdf_3k.append(hname.GetName())
+            if 'pdf_2' in hname.GetName():
+                h_lep_pdf_2k.append(hname.GetName())
+            if 'scale' in hname.GetName():
+                h_lepscale.append(hname.GetName())
+        
+    ref_had_scale =0.
+    ref_lep_scale =0.
+    ##had scale syst
+    int_had_scale=[]
+    for name in h_hadscale:
+        print name
+        if '1001' in name : 
+            ref_had_scale = hdir.Get(name).Integral()
+        else:
+            int_had_scale.append(hdir.Get(name).Integral())
+    for n,value in enumerate(int_had_scale):
+        int_had_scale[n]=abs((value-ref_had_scale)/ref_had_scale)
+    print 'had scale %s jet: %.2f, %.2f' %(str(j), min(int_had_scale), max(int_had_scale))
+        
+    ##lep scale syst
+    int_lep_scale=[]
+    for name in h_lepscale:
+        if '1001' in name : 
+            ref_lep_scale = hdir.Get(name).Integral()
+        else:
+            int_lep_scale.append(hdir.Get(name).Integral())
+    for n,value in enumerate(int_lep_scale):
+        int_lep_scale[n]=abs((value-ref_lep_scale)/ref_lep_scale)
+    print 'lep scale %s jet: %.2f, %.2f'%(str(j), min(int_lep_scale), max(int_lep_scale))
+
+    ref_had_pdf_4k=0.
+    ref_lep_pdf_4k =0.
+    ref_had_pdf_3k=0.
+    ref_lep_pdf_3k =0.
+    ref_had_pdf_2k=0.
+    ref_lep_pdf_2k =0.
+
+    int_lep_pdf_4k=[]
+    int_lep_pdf_3k=[]
+    int_lep_pdf_2k=[]
+
+    int_had_pdf_4k=[]
+    int_had_pdf_3k=[]
+    int_had_pdf_2k=[]
+
+
+    for name in h_had_pdf_4k:
+        if '4001' in name : 
+            ref_had_pdf_4k = hdir.Get(name).Integral()
+        else:
+            int_had_pdf_4k.append(hdir.Get(name).Integral())
+    for n,value in enumerate(int_had_pdf_4k):
+        int_had_pdf_4k[n]=abs((value-ref_had_pdf_4k)/ref_had_pdf_4k)
+    print 'had pdf 4k %s jet: %.2f, %.2f'%(str(j),  min(int_had_pdf_4k), max(int_had_pdf_4k))
+
+    for name in h_had_pdf_3k:
+        if '3001' in name : 
+            ref_had_pdf_3k = hdir.Get(name).Integral()
+        else:
+            int_had_pdf_3k.append(hdir.Get(name).Integral())
+    for n,value in enumerate(int_had_pdf_3k):
+        int_had_pdf_3k[n]=abs((value-ref_had_pdf_3k)/ref_had_pdf_3k)
+    print 'had pdf 3k %s jet: %.2f, %.2f' %(str(j), min(int_had_pdf_3k), max(int_had_pdf_3k))
+
+    for name in h_had_pdf_2k:
+        if '2001' in name : 
+            ref_had_pdf_2k = hdir.Get(name).Integral()
+        else:
+            int_had_pdf_2k.append(hdir.Get(name).Integral())
+    for n,value in enumerate(int_had_pdf_2k):
+        int_had_pdf_2k[n]=abs((value-ref_had_pdf_2k)/ref_had_pdf_2k)
+    print 'had pdf 2k %s jet: %.2f, %.2f' %(str(j),min(int_had_pdf_2k), max(int_had_pdf_2k))
+
+    for name in h_lep_pdf_4k:
+        if '4001' in name : 
+            ref_lep_pdf_4k = hdir.Get(name).Integral()
+        else:
+            int_lep_pdf_4k.append(hdir.Get(name).Integral())
+    for n,value in enumerate(int_lep_pdf_4k):
+        int_lep_pdf_4k[n]=abs((value-ref_lep_pdf_4k)/ref_lep_pdf_4k)
+    print 'lep pdf 4k %s jet: %.2f, %.2f' %(str(j),min(int_lep_pdf_4k), max(int_lep_pdf_4k))
+
+    for name in h_lep_pdf_3k:
+        if '3001' in name : 
+            ref_lep_pdf_3k = hdir.Get(name).Integral()
+        else:
+            int_lep_pdf_3k.append(hdir.Get(name).Integral())
+    for n,value in enumerate(int_lep_pdf_3k):
+        int_lep_pdf_3k[n]=abs((value-ref_lep_pdf_3k)/ref_lep_pdf_3k)
+    print 'lep pdf 3k %s jet: %.2f, %.2f' %(str(j),min(int_lep_pdf_3k), max(int_lep_pdf_3k))
+
+    for name in h_lep_pdf_2k:
+        if '2001' in name : 
+            ref_lep_pdf_2k = hdir.Get(name).Integral()
+        else:
+            int_lep_pdf_2k.append(hdir.Get(name).Integral())
+    for n,value in enumerate(int_lep_pdf_2k):
+        int_lep_pdf_2k[n]=abs((value-ref_lep_pdf_2k)/ref_lep_pdf_2k)
+
+    print 'lep pdf 2k %s jet: %.2f, %.2f' %(str(j), min(int_lep_pdf_2k), max(int_lep_pdf_2k))
+
+
+

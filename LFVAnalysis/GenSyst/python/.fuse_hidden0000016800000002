@@ -1,0 +1,259 @@
+import ROOT
+import math
+
+hfile = ROOT.TFile("TheoUnc_HiggsToMuTau_125_VBF.root", "READ")
+hdir = hfile.Get("demo") 
+hlist = hdir.GetListOfKeys()
+
+mupt_lep = [50,45,25]
+mupt_had = [45,35,30]
+ept = [15,15,15]
+taupt = [35,40,40]
+
+hWeights=[]
+weights = []
+for hname in hlist:
+    if 'Weights' in hname.GetName():
+        # print hname
+        hWeights.append(hname.GetName())
+        weights.append((hname.GetName(), hdir.Get(hname.GetName()).Integral()))
+
+        
+        
+for j in range(0, 3):
+    had_pdf=[]
+    lep_pdf=[]
+    had_scale=[]
+    lep_scale=[]
+    h_had_pdf_2k =[]
+    h_had_pdf_3k =[]
+    h_had_pdf_4k =[]
+    h_hadscale =[]
+    h_lep_pdf_2k =[]
+    h_lep_pdf_3k =[]
+    h_lep_pdf_4k =[]
+    h_lepscale =[]
+    for hname in hlist:
+        
+        if hdir.Get(hname.GetName()).IsA() != ROOT.TH2F.Class() : continue
+        if str(j)+'j' not in hname.GetName(): continue
+        
+        if 'had' in hname.GetName():
+            if 'j40' in hname.GetName():
+                h_had_pdf_4k.append(hname.GetName())
+            if 'j30' in hname.GetName():
+                h_had_pdf_3k.append(hname.GetName())
+            if 'j2' in hname.GetName():
+                h_had_pdf_2k.append(hname.GetName())
+            if 'j10' in hname.GetName():
+                h_hadscale.append(hname.GetName())
+        if 'lep' in hname.GetName():
+            if 'j40' in hname.GetName():
+                h_lep_pdf_4k.append(hname.GetName())
+            if 'j30' in hname.GetName():
+                h_lep_pdf_3k.append(hname.GetName())
+            if 'j2' in hname.GetName():
+                h_lep_pdf_2k.append(hname.GetName())
+            if 'j10' in hname.GetName():
+                h_lepscale.append(hname.GetName())
+
+
+    
+    ref_had_scale =0.
+    ref_lep_scale =0.
+    ##had scale syst
+    int_had_scale=[]
+    int_lep_scale=[]
+    totalIntegral = []
+    totalEntries = []
+
+    
+    ref_had_scale = 0
+    ref_lep_scale=0
+    
+    for n,name in enumerate(h_hadscale):
+        
+        if '1001' in name : 
+            h_ref_had_scale = hdir.Get(name)
+            ref_had_scale = h_ref_had_scale.Integral(taupt[j]+1, 100, mupt_had[j]+1, 100)/weights[0][1]
+            h_ref_lep_scale = hdir.Get(h_lepscale[n])
+            ref_lep_scale = h_ref_lep_scale.Integral(ept[j]+1, 100, mupt_lep[j]+1, 100)/weights[0][1]
+            totalIntegral.append(h_ref_had_scale.Integral())
+            totalEntries.append(h_ref_had_scale.GetEntries())
+        else:
+            h_ref_had_scale = hdir.Get(name)
+            h_ref_lep_scale = hdir.Get(h_lepscale[n])
+            int_had_scale.append( h_ref_had_scale.Integral(taupt[j]+1, 100, mupt_had[j]+1, 100)/weights[n][1])
+            int_lep_scale.append( h_ref_lep_scale.Integral(ept[j]+1, 100, mupt_lep[j]+1, 100)/weights[n][1])
+            totalIntegral.append(h_ref_had_scale.Integral())
+            totalEntries.append(h_ref_had_scale.GetEntries())
+            
+#    print int_had_scale, ref_had_scale 
+#    print int_lep_scale, ref_lep_scale 
+    for n,value in enumerate(int_had_scale):
+        int_had_scale[n]=value+int_lep_scale[n]
+    ref_had_scale+=ref_lep_scale
+    
+    unc= (max(int_had_scale)-min(int_had_scale))/2/ref_had_scale
+    
+    #print int_had_scale
+    print 'scale %s jet: %.1f + Add yellow report reccomendation' %(str(j),unc*100)
+    
+    
+    ref_had_scale =0.
+    ref_lep_scale =0.
+    ##had scale syst
+    int_had_scale=[]
+    int_lep_scale=[]
+    int_pdf=[]
+
+    h_ref_had_scale = hdir.Get(h_hadscale[0])
+    ref_had_scale = h_ref_had_scale.Integral(taupt[j]+1, 100, mupt_had[j]+1, 100)/weights[0][1]
+    h_ref_lep_scale = hdir.Get(h_lepscale[0])
+    ref_lep_scale = h_ref_lep_scale.Integral(ept[j]+1, 100, mupt_lep[j]+1, 100)/weights[0][1]
+    nnpdf=0
+    for k,w in enumerate(weights):
+        #print k, w
+        if '2001' in w[0]:
+            nnpdf=k
+    for n,name in enumerate(h_had_pdf_2k):
+        h_ref_had_scale = hdir.Get(name)
+        h_ref_lep_scale = hdir.Get(h_lep_pdf_2k[n])
+        int_had_scale.append( h_ref_had_scale.Integral(taupt[j]+1, 100, mupt_had[j]+1, 100)/weights[nnpdf+n][1])
+        int_lep_scale.append( h_ref_lep_scale.Integral(ept[j]+1, 100, mupt_lep[j]+1, 100)/weights[nnpdf+n][1])
+
+    for n,value in enumerate(int_had_scale):
+        int_had_scale[n]=value+int_lep_scale[n]
+    ref_had_scale+=ref_lep_scale
+
+    a_nnpdf=ref_had_scale
+        
+    ap=[]
+    am=[]
+    sum2ap=0
+    sum2am=0
+    
+    for n in range(0,len(int_had_scale)):
+        if int_had_scale[n] < ref_had_scale:
+            am.append(int_had_scale[n])
+        else:
+            ap.append(int_had_scale[n])
+    for a in ap:
+        sum2ap+=(a-ref_had_scale)*(a-ref_had_scale)
+    for a in am:
+        sum2am+=(ref_had_scale-a)*(ref_had_scale-a)
+    
+    deltaap=math.sqrt(sum2ap/len(ap)) if len(ap)!=0 else 0
+    deltaam=math.sqrt(sum2am/len(am)) if len(am)!=0 else 0
+    
+    print 'nnpdf %s j: %.6f, %.6f' %(str(j), deltaap/a_nnpdf, deltaam/a_nnpdf)
+
+
+    
+    ref_had_scale =0.
+    ref_lep_scale =0.
+    ##had scale syst
+    int_had_scale=[]
+    int_lep_scale=[]
+
+    
+    pdf=0
+    for k,w in enumerate(weights):
+        if '3001' in w[0]:
+            pdf=k
+####CT10nlo + CT10nlo_as_0117 + CT10nlo_as_0119
+    for n,name in enumerate(h_had_pdf_3k):
+    
+        if '3001' in name : 
+            h_ref_had_scale = hdir.Get(name)
+            ref_had_scale = h_ref_had_scale.Integral(taupt[j]+1, 100, mupt_had[j]+1, 100)/weights[pdf][1]
+            h_ref_lep_scale = hdir.Get(h_lep_pdf_3k[n])
+            ref_lep_scale = h_ref_lep_scale.Integral(ept[j]+1, 100, mupt_lep[j]+1, 100)/weights[pdf][1]
+        else:
+            h_ref_had_scale = hdir.Get(name)
+            h_ref_lep_scale = hdir.Get(h_lep_pdf_3k[n])
+            int_had_scale.append( h_ref_had_scale.Integral(taupt[j]+1, 100, mupt_had[j]+1, 100)/weights[pdf+n][1])
+            int_lep_scale.append( h_ref_lep_scale.Integral(ept[j]+1, 100, mupt_lep[j]+1, 100)/weights[pdf+n][1])
+
+
+    for n,value in enumerate(int_had_scale):
+        int_had_scale[n]=value+int_lep_scale[n]
+    ref_had_scale+=ref_lep_scale
+
+    a_ct10=ref_had_scale
+    
+    sum2ap_ct10=0.
+    sum2am_ct10=0.
+    
+    for i in range(0,26):#was27
+        
+        sum2ap_ct10+=max(int_had_scale[2*i+1]-ref_had_scale, int_had_scale[2*i]-ref_had_scale,0)*max(int_had_scale[2*i+1]-ref_had_scale, int_had_scale[2*i]-ref_had_scale,0)
+        sum2am_ct10+=max(ref_had_scale-int_had_scale[2*i+1],ref_had_scale- int_had_scale[2*i],0)*max(ref_had_scale-int_had_scale[2*i+1],ref_had_scale- int_had_scale[2*i],0)
+    deltaap_ct10=math.sqrt(sum2ap_ct10)/1.645
+    deltaam_ct10=math.sqrt(sum2am_ct10)/1.645
+
+    print 'CT10 %s j: %.6f, %.6f' %(str(j), deltaap_ct10/a_ct10, deltaam_ct10/a_ct10)
+
+    
+    ref_had_scale =0.
+    ref_lep_scale =0.
+    ##had scale syst
+    int_had_scale=[]
+    int_lep_scale=[]
+    
+##MMHT2014nlo68clas118
+    pdf=0
+    for k,w in enumerate(weights):
+        if '4001' in w[0]:
+            pdf=k
+
+    for n,name in enumerate(h_had_pdf_4k):
+    
+        if '4001' in name : 
+            h_ref_had_scale = hdir.Get(name)
+            ref_had_scale = h_ref_had_scale.Integral(taupt[j]+1, 100, mupt_had[j]+1, 100)/weights[pdf][1]
+            h_ref_lep_scale = hdir.Get(h_lep_pdf_4k[n])
+            ref_lep_scale = h_ref_lep_scale.Integral(ept[j]+1, 100, mupt_lep[j]+1, 100)/weights[pdf][1]
+        else:
+            h_ref_had_scale = hdir.Get(name)
+            h_ref_lep_scale = hdir.Get(h_lep_pdf_4k[n])
+            int_had_scale.append( h_ref_had_scale.Integral(taupt[j]+1, 100, mupt_had[j]+1, 100)/weights[pdf+n][1])
+            int_lep_scale.append( h_ref_lep_scale.Integral(ept[j]+1, 100, mupt_lep[j]+1, 100)/weights[pdf+n][1])
+
+
+    newref_had=0.
+    newref_lep=0.
+    for n,value in enumerate(int_had_scale):
+        if n<50:
+            int_had_scale[n]=value+int_lep_scale[n]
+        if n==50:
+            newref_had=value
+            newref_lep=int_lep_scale[n]
+        if n>50:
+            int_had_scale[n]=value+int_lep_scale[n]-newref_had+ref_had_scale-ref_had_scale+newref_had
+            
+            
+    ref_had_scale+=ref_lep_scale
+
+    a_mmht=ref_had_scale
+    
+    sum2ap_mmht=0.
+    sum2am_mmht=0.
+    
+    for i in range(0,27):
+        sum2ap_mmht+=max(int_had_scale[2*i+1]-ref_had_scale, int_had_scale[2*i]-ref_had_scale,0)*max(int_had_scale[2*i+1]-ref_had_scale, int_had_scale[2*i]-ref_had_scale,0)
+        sum2am_mmht+=max(ref_had_scale-int_had_scale[2*i+1],ref_had_scale- int_had_scale[2*i],0)*max(ref_had_scale-int_had_scale[2*i+1],ref_had_scale- int_had_scale[2*i],0)
+    deltaap_mmht=math.sqrt(sum2ap_mmht)
+    deltaam_mmht=math.sqrt(sum2am_mmht)
+    
+    print 'MMHT %s j: %.6f, %.6f' %(str(j), deltaap_mmht/a_mmht, deltaam_mmht/a_mmht)
+
+    deltamax=max(a_nnpdf+deltaap, a_ct10+deltaap_ct10, a_mmht+deltaap_mmht)
+    deltamin=min(a_nnpdf-deltaap, a_ct10-deltaap_ct10, a_mmht-deltaap_mmht)
+
+    unc=(deltamax-deltamin)/2/a_nnpdf
+
+    
+
+    print 'pdf %s jet: %.1f' %(str(j), unc*100.) 
+
