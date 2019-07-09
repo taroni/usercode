@@ -20,7 +20,7 @@ inputFiles = readFiles
 #outputFile = "zMuMu_prasanna_noTagNoRecov.root"
 process.source = cms.Source ("PoolSource", fileNames = inputFiles )                             
 process.simpleAnalyser = cms.EDAnalyzer(
-    'RecHitSimpleAnalyser',
+    'UncalibratedRecHitSimpleAnalyser',
     EBuncalibRecHitCollection = cms.InputTag("ecalMultiFitUncalibRecHit","EcalUncalibRecHitsEB"),
     )
 
